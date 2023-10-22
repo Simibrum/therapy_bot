@@ -1,0 +1,18 @@
+# Therapy Bot Docker Compose File
+version: "3.8"
+
+services:
+  backend:
+    image: therapy_bot_backend:latest
+    build: ./backend
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    ports:
+      - "8000:80"
+    # Need to define volumes for cached embeddings and parser
+
+  frontend:
+    image: therapy_bot_frontend:latest
+    build: ./frontend
+    ports:
+      - "3000:80"

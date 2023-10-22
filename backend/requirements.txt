@@ -1,0 +1,31 @@
+# Requirements for Web App
+fastapi
+uvicorn
+bcrypt
+fastapi-login
+httpx
+
+# Database
+sqlalchemy
+cryptography
+
+# Testing
+pytest
+pytest-cov
+pytest-mock
+
+# XML Parsing
+beautifulsoup4
+lxml
+
+# Web requests
+requests
+
+# Code formatting
+black
+
+# QA / Agent functionality
+langchain
+openai
+tiktoken
+numpy
