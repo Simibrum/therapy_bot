@@ -1,5 +1,6 @@
 // File to define a lobby scene.
 import React from 'react';
+import room_1 from '../images/room_1.png';
 
 const HomeScreen = () => {
     return (
@@ -29,7 +30,7 @@ const HomeScreen = () => {
 
 const styles = {
     container: {
-        backgroundImage: 'url(%PUBLIC_URL%/images/Room 1.png)',
+        backgroundImage: `url(${room_1})`,
         height: '100vh',
         width: '100vw',
         display: 'flex',
