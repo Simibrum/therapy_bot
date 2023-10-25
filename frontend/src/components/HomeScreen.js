@@ -31,6 +31,10 @@ const HomeScreen = () => {
 const styles = {
     container: {
         backgroundImage: `url(${room_1})`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center center',
+        backgroundSize: 'cover',
+        backgroundColor: 'white', // fallback color if image fails to load
         height: '100vh',
         width: '100vw',
         display: 'flex',

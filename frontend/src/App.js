@@ -21,7 +21,7 @@ function App() {
 
     // Output
     return (
-        <div className="App py-5">
+        <div className="App">
             {!isLoggedIn ? (
                 <LoginScreen onLogin={login} />
             ) : (
