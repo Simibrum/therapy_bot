@@ -1,0 +1,17 @@
+# Use an official Node runtime as the base image
+FROM node
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy package.json and package-lock.json for using npm
+COPY package*.json ./
+
+# Install the required npm packages
+RUN npm install
+
+# Copy the current directory contents into the container at /app
+COPY . .
+
+# Start the React development server
+CMD ["npm", "start"]
