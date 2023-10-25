@@ -1,21 +1,29 @@
 import React, {useEffect, useState, useCallback} from 'react';
 import HomeScreen from "./components/HomeScreen";
 import LoginScreen from "./components/LoginScreen";
+import { handleLogin } from './authService';
 
 function App() {
 
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [loginError, setLoginError] = useState(null);
 
-    const handleLogin = (username, password) => {
-        // Placeholder to perform log in logic
-        setIsLoggedIn(true);
-    };
+    async function login(username, password) {
+        try {
+            const token = await handleLogin(username, password);
+            localStorage.setItem('jwtToken', token);
+            setIsLoggedIn(true);
+        } catch (error) {
+            console.error('Error during login:', error);
+            setLoginError(error.message);
+        }
+    }
 
     // Output
     return (
         <div className="App py-5">
             {!isLoggedIn ? (
-                <LoginScreen onLogin={handleLogin} />
+                <LoginScreen onLogin={login} />
             ) : (
                 <HomeScreen />
             )}

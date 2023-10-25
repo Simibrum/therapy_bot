@@ -13,7 +13,6 @@ def test_websocket_connection():
         expected_response = {
             'query': 'What is the meaning of life?',
             'result': None,
-            'sources': [],
             'state': 'PROCESSING'
         }
         assert response == expected_response

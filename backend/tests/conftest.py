@@ -66,7 +66,7 @@ def user_instance(shared_session):
     """Create a user instance."""
     user = User(
         username="testuser",
-        password_hash="hashedpassword", # Temporary hash - password is set below
+        password_hash="hashedpassword",  # Temporary hash - password is set below
         email="test@example.com"
     )
     user.set_password("hashedpassword")

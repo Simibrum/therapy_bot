@@ -3,7 +3,7 @@ import React from 'react';
 
 const HomeScreen = () => {
     return (
-        <div style={styles.container}>
+        <div style={styles.container} data-testid="home-screen">
             <div style={styles.navBar}>
                 Welcome, Test User!
             </div>

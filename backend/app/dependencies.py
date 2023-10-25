@@ -7,7 +7,7 @@ from config import SECRET_KEY
 from app.crud.users import get_user_by_username
 
 # Configure FASTAPI Login
-manager = LoginManager(SECRET_KEY.encode("utf-8"), '/token', use_cookie=True, cookie_name='access_token')
+manager = LoginManager(SECRET_KEY.encode("utf-8"), '/token', use_cookie=False)
 
 
 @manager.user_loader(db_session=None)

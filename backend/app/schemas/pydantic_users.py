@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class Token(BaseModel):
     access_token: str
+    refresh_token: Optional[str] = None
     token_type: str
 
 
@@ -32,3 +33,8 @@ class UserUpdate(BaseModel):
     password: Optional[str] = None
     is_active: Optional[bool] = None
     role: Optional[str] = None
+
+
+class UserLogin(BaseModel):
+    username: str
+    password: str

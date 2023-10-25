@@ -6,6 +6,13 @@ from config.init_logger import logger
 # Load API Key from environment variable
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
+# Generate a secret key for the JWT
+SECRET_KEY = os.getenv("SECRET_KEY", "dummy_secret_key")
+
+# Set the token time out value
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+REFRESH_TOKEN_EXPIRE_DAYS = 7
+
 
 class ProductionConfig:
     """Production configuration - e.g. for remote deployment."""

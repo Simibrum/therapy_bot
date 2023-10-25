@@ -15,7 +15,7 @@ const LoginScreen = ({ onLogin}) => {
     };
 
     return (
-        <div className="login-container">
+        <div className="login-container" data-testid="login-screen">
             <h2>Login</h2>
             <form onSubmit={handleSubmit}>
                 <div className="input-group">
@@ -23,6 +23,7 @@ const LoginScreen = ({ onLogin}) => {
                     <input
                         type="text"
                         id="username"
+                        data-testid="username-input"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required
@@ -33,12 +34,13 @@ const LoginScreen = ({ onLogin}) => {
                     <input
                         type="password"
                         id="password"
+                        data-testid="password-input"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                     />
                 </div>
-                <button type="submit">Login</button>
+                <button type="submit" data-testid="login-button">Login</button>
             </form>
         </div>
     );

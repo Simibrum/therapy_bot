@@ -7,13 +7,17 @@ from starlette.websockets import WebSocketState
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
 from config import logger
+from app.routes.login import router as login_router
 
 app = FastAPI()
 
 executor = ThreadPoolExecutor()
 
+# Add the login router
+app.include_router(login_router)
 
-def slow_function(query: str) -> dict:
+
+def slow_function(query: str) -> str:
     import time
     time.sleep(0.25)  # Simulate slow logic
     return "test_output"
