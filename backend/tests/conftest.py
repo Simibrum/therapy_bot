@@ -39,6 +39,13 @@ def db_setup():
     TestConfig.remove_temp_file()
 
 
+# Session manager object to use in tests
+@pytest.fixture
+def db_session_manager(db_setup):
+    """Create a session manager."""
+    return DBSessionManager()
+
+
 # Session fixture to use in tests
 @pytest.fixture
 def shared_session(db_setup):

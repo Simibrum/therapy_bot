@@ -7,7 +7,7 @@ from sqlalchemy.orm import relationship
 from enum import Enum as PyEnum
 from datetime import timedelta
 from database import Base
-from crypto_utils import generate_encryption_key
+from utils.text_crypto import generate_encryption_key
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

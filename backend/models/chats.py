@@ -6,7 +6,7 @@ from sqlalchemy import ForeignKey, Integer, String, DateTime, func, LargeBinary
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from database import Base
-from crypto_utils import encrypt_string, decrypt_string
+from utils.text_crypto import encrypt_string, decrypt_string
 from config import logger
 from llm.embeddings import get_embedding
 
@@ -68,8 +68,12 @@ class Chat(Base):
             # Convert to bytes
             self._vector = vector.tobytes()
 
-    def fetch_text_vector(self):
+    def fetch_text_vector(self) -> np.array:
         """Fetch the embedding for the text."""
         logger.debug(f"Fetching embedding for chat {self.id}")
         if self._encrypted_text:
             self._vector = get_embedding(self.text)
+        else:
+            self._vector = None
+        return self._vector
+
