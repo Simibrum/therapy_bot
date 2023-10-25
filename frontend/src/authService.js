@@ -1,7 +1,8 @@
 // authService.js
 
 export async function handleLogin(username, password) {
-  const apiUrl = 'YOUR_BACKEND_URL/login';
+  const backendURL = process.env.REACT_APP_BACKEND_URL;
+  const apiUrl = backendURL + '/login';
 
   try {
     const response = await fetch(apiUrl, {

@@ -5,11 +5,26 @@ import json
 from concurrent.futures import ThreadPoolExecutor
 from starlette.websockets import WebSocketState
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 
 from config import logger
 from app.routes.login import router as login_router
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:3000",
+    "http://192.168.32.3:3000",
+    # Add any other origins you might have
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 executor = ThreadPoolExecutor()
 

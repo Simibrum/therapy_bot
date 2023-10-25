@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useState} from 'react';
 import HomeScreen from "./components/HomeScreen";
 import LoginScreen from "./components/LoginScreen";
 import { handleLogin } from './authService';
@@ -27,6 +27,7 @@ function App() {
             ) : (
                 <HomeScreen />
             )}
+            {loginError && <div className="text-danger">{loginError}</div>}
         </div>
     );
 }

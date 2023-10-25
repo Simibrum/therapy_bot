@@ -7,6 +7,8 @@ services:
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     environment:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+      DEBUG_MODE: "True"
+      CONFIG_ENV: "development"
     ports:
       - "8000:8000"
     volumes:
@@ -17,6 +19,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
+    environment:
+      REACT_APP_BACKEND_URL: http://localhost:8000
     ports:
       - "3000:80"
     volumes:

@@ -7,6 +7,8 @@ services:
     build: ./backend
     environment:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+      DEBUG_MODE: "False"
+      CONFIG_ENV: "production"
     ports:
       - "8000:80"
     # Need to define volumes for cached embeddings and parser

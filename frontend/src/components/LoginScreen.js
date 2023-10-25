@@ -1,5 +1,9 @@
 // Login Screen
 import React, { useState } from 'react';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import Card from 'react-bootstrap/Card';
+import {CardHeader} from "react-bootstrap";
 
 const LoginScreen = ({ onLogin}) => {
     const [username, setUsername] = useState('');
@@ -15,34 +19,40 @@ const LoginScreen = ({ onLogin}) => {
     };
 
     return (
-        <div className="login-container" data-testid="login-screen">
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <div className="input-group">
-                    <label htmlFor="username">Username</label>
-                    <input
-                        type="text"
-                        id="username"
-                        data-testid="username-input"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="input-group">
-                    <label htmlFor="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        data-testid="password-input"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </div>
-                <button type="submit" data-testid="login-button">Login</button>
-            </form>
-        </div>
+        <Card>
+            <CardHeader>Login</CardHeader>
+            <Card.Body>
+                <Form onSubmit={handleSubmit}>
+                    <Form.Group className="mb-3" controlId="formBasicEmail">
+                        <Form.Label>Username</Form.Label>
+                        <Form.Control
+                            type="username"
+                            placeholder="Enter username"
+                            data-testid="username-input"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                        />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="formBasicPassword">
+                        <Form.Label>Password</Form.Label>
+                        <Form.Control
+                            type="password"
+                            placeholder="Password"
+                            data-testid="password-input"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </Form.Group>
+
+                    <Button variant="primary" type="submit" data-testid="login-button">
+                        Submit
+                    </Button>
+                </Form>
+            </Card.Body>
+        </Card>
     );
 };
 

@@ -18,14 +18,31 @@ class ProductionConfig:
     """Production configuration - e.g. for remote deployment."""
     name = "production"
     # Database setup
-    # Use an SQLite database for now - in database folder
-    DATABASE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "database", "database.db")
+    # Use an SQLite database for now - in database folder that is sibling of parent config folder
+    DATABASE_FILE = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "database", "database.db"
+    )
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{DATABASE_FILE}"
     SQLALCHEMY_ENGINE_OPTIONS = {'connect_args': {'check_same_thread': False}}
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TESTING = False
     DEBUG = False
     BCRYPT_LOG_ROUNDS = 12
+
+
+class DevelopmentConfig:
+    """Development configuration - e.g. for local dev."""
+    name = "development"
+    # Use an SQLite database for now - in database folder that is sibling of parent config folder
+    DATABASE_FILE = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "database", "dev_database.db"
+    )
+    SQLALCHEMY_DATABASE_URI = f"sqlite:///{DATABASE_FILE}"
+    SQLALCHEMY_ENGINE_OPTIONS = {'connect_args': {'check_same_thread': False}}
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    TESTING = False
+    DEBUG = True
+    BCRYPT_LOG_ROUNDS = 4
 
 
 class TestConfig:
@@ -61,6 +78,9 @@ def get_config():
     if config_env == "production":
         logger.debug("Using production config")
         config = ProductionConfig
+    elif config_env == "development":
+        logger.debug("Using development config")
+        config = DevelopmentConfig
     elif config_env == "testing":
         logger.debug("Using test config")
         config = TestConfig
