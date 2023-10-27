@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import {CardHeader} from "react-bootstrap";
 
-const LoginScreen = ({ onLogin}) => {
+const LoginScreen = ({ onLogin, loginError }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
@@ -52,6 +52,7 @@ const LoginScreen = ({ onLogin}) => {
                     </Button>
                 </Form>
             </Card.Body>
+            {loginError && <div className="text-danger">{loginError}</div>}
         </Card>
     );
 };

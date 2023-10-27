@@ -1,31 +1,27 @@
 // File to define a lobby scene.
 import React from 'react';
+import { Container, Row, Col} from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import room_1 from '../images/room_1.png';
 
 const HomeScreen = () => {
     return (
-        <div style={styles.container} data-testid="home-screen">
-            <div style={styles.navBar}>
-                Welcome, Test User!
-            </div>
-            <div style={styles.lobby}>
-                <div style={styles.receptionist}>
+        <Container fluid style={styles.container} data-testid="home-screen">
+            <Row style={styles.lobby}>
+                <Col xs={4} style={styles.receptionist}>
                     Receptionist (settings)
-                </div>
-                <div style={styles.bench}>
+                </Col>
+                <Col xs={4} style={styles.bench}>
                     Cozy waiting bench
-                </div>
-                <div style={styles.door} onClick={() => startNewSession()}>
-                    Door (new session)
-                </div>
-            </div>
-        </div>
+                </Col>
+                <Col xs={4} style={styles.door}>
+                    <Link to={"/session"} style={styles.door}>
+                        Door (new session)
+                    </Link>
+                </Col>
+            </Row>
+        </Container>
     );
-
-    function startNewSession() {
-        // logic to start a new therapy session
-        console.log('Starting new session...');
-    }
 };
 
 const styles = {
@@ -36,9 +32,7 @@ const styles = {
         backgroundSize: 'cover',
         backgroundColor: 'white', // fallback color if image fails to load
         height: '100vh',
-        width: '100vw',
-        display: 'flex',
-        flexDirection: 'column'
+        width: '100vw'
     },
     navBar: {
         height: '10%',
@@ -48,10 +42,6 @@ const styles = {
     },
     lobby: {
         flex: 1,
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
         padding: '0 10%'
     },
     receptionist: {
@@ -61,8 +51,10 @@ const styles = {
         // style for the waiting bench area
     },
     door: {
-        cursor: 'pointer',
-        // style for the door area
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        cursor: 'pointer'
     }
 };
 

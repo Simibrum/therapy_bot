@@ -1,35 +1,53 @@
-import React, {useState} from 'react';
+// App code
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
+
 import HomeScreen from "./components/HomeScreen";
 import LoginScreen from "./components/LoginScreen";
-import { handleLogin } from './authService';
+import SessionScreen from './components/SessionScreen';
+import TopNavbar from './components/TopNavbar';
+import { useUser } from './UserContext';
 
-function App() {
+function RoutesHandler() {
+    const navigate = useNavigate();
+    const { isLoggedIn, loginError, userFirstName, login: contextLogin, logout: contextLogout } = useUser();
 
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [loginError, setLoginError] = useState(null);
-
-    async function login(username, password) {
-        try {
-            const token = await handleLogin(username, password);
-            localStorage.setItem('jwtToken', token);
-            setIsLoggedIn(true);
-        } catch (error) {
-            console.error('Error during login:', error);
-            setLoginError(error.message);
+    async function handleLogin(username, password) {
+        const success = await contextLogin(username, password);
+        if (success) {
+            navigate('/');
         }
     }
 
-    // Output
+    function handleLogout() {
+        contextLogout();
+        navigate('/login');
+    }
+
     return (
         <div className="App">
-            {!isLoggedIn ? (
-                <LoginScreen onLogin={login} />
-            ) : (
-                <HomeScreen />
-            )}
-            {loginError && <div className="text-danger">{loginError}</div>}
+            <TopNavbar isLoggedIn={isLoggedIn} userFirstName={userFirstName} onLogout={handleLogout} />
+            <Routes>
+                <Route
+                    path="/login"
+                    element={!isLoggedIn ? <LoginScreen onLogin={handleLogin} loginError={loginError} /> : <HomeScreen />}>
+                </Route>
+                <Route
+                    path="/session"
+                    element={isLoggedIn ? <SessionScreen /> : <LoginScreen onLogin={handleLogin} loginError={loginError}/>} />
+                <Route path="/" element={isLoggedIn ? <HomeScreen /> : <LoginScreen onLogin={handleLogin} loginError={loginError}/>} />
+            </Routes>
         </div>
     );
 }
 
+function App() {
+    return (
+        <Router>
+            <RoutesHandler />
+        </Router>
+    );
+}
+
 export default App;
+

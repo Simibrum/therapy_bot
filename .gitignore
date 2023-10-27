@@ -161,3 +161,4 @@ cython_debug/
 
 # Databases
 database/*.db
+/backend/database/dev_database.db
