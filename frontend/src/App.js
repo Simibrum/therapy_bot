@@ -27,6 +27,7 @@ function RoutesHandler() {
     return (
         <div className="App">
             <TopNavbar isLoggedIn={isLoggedIn} userFirstName={userFirstName} onLogout={handleLogout} />
+
             <Routes>
                 <Route
                     path="/login"
@@ -37,6 +38,7 @@ function RoutesHandler() {
                     element={isLoggedIn ? <SessionScreen /> : <LoginScreen onLogin={handleLogin} loginError={loginError}/>} />
                 <Route path="/" element={isLoggedIn ? <HomeScreen /> : <LoginScreen onLogin={handleLogin} loginError={loginError}/>} />
             </Routes>
+
         </div>
     );
 }

@@ -9,14 +9,11 @@ const HomeScreen = () => {
         <Container fluid style={styles.container} data-testid="home-screen">
             <Row style={styles.lobby}>
                 <Col xs={4} style={styles.receptionist}>
-                    Receptionist (settings)
                 </Col>
                 <Col xs={4} style={styles.bench}>
-                    Cozy waiting bench
                 </Col>
                 <Col xs={4} style={styles.door}>
-                    <Link to={"/session"} style={styles.door}>
-                        Door (new session)
+                    <Link to={"/session"} style={{...styles.door, width: '100%', height: '100%'}}>
                     </Link>
                 </Col>
             </Row>
@@ -34,15 +31,9 @@ const styles = {
         height: '100vh',
         width: '100vw'
     },
-    navBar: {
-        height: '10%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
     lobby: {
         flex: 1,
-        padding: '0 10%'
+        height: '100%',
     },
     receptionist: {
         // style for the receptionist area
@@ -54,7 +45,8 @@ const styles = {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        height: '100%'
     }
 };
 
