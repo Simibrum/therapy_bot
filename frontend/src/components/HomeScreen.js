@@ -2,7 +2,7 @@
 import React from 'react';
 import { Container, Row, Col} from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import room_1 from '../images/room_1.png';
+import room_1 from '../images/waiting_room/room_1.png';
 
 const HomeScreen = () => {
     return (

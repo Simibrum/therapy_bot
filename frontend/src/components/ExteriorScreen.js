@@ -1,0 +1,1 @@
+// Screen to render the exterior of a building which is used as the default landing page
