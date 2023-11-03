@@ -1,13 +1,13 @@
 """Route for login."""
 from datetime import timedelta
-from fastapi import APIRouter, Depends, Form
+from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordBearer
 from fastapi_login.exceptions import InvalidCredentialsException
 from sqlalchemy.orm import Session
-from app.schemas.pydantic_users import UserLogin, Token
+from app.schemas.pydantic_users import UserLogin, UserLoginOut
 from app.dependencies import manager, query_user
 from database.db_engine import get_db
-from fastapi.responses import HTMLResponse, Response
+
 
 router = APIRouter()
 
@@ -35,4 +35,11 @@ def login(
         data={'sub': username},
         expires=timedelta(hours=1)
     )
-    return {'access_token': access_token, 'token_type': 'bearer'}
+    return UserLoginOut(
+        access_token=access_token,
+        token_type='bearer',
+        id=user.id,
+        username=user.username,
+        first_name=user.first_name,
+        is_active=user.is_active,
+    )

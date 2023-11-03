@@ -17,3 +17,4 @@ class Therapist(Base):
     # Relationships
     user = relationship("User", back_populates="therapist")
     chats = relationship("Chat", back_populates="therapist")
+    therapy_sessions = relationship("TherapySession", back_populates="therapist")

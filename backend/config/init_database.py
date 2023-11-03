@@ -23,6 +23,8 @@ def create_default_user():
         password_hash="1234567"
     )
     user.set_password(password)
+    first_name = "Brian"
+    user.first_name = first_name
     session.add(user)
     session.commit()
     session.close()

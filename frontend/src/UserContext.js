@@ -13,17 +13,20 @@ export const UserProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [loginError, setLoginError] = useState(null);
     const [userFirstName, setUserFirstName] = useState(null);
+    const [userID, setUserID] = useState(null);
 
     async function login(username, password) {
 
         try {
-            const token = await handleLogin(username, password);
+            const data = await handleLogin(username, password);
             // 1. Store the JWT token in localStorage
-            localStorage.setItem('jwtToken', token);
+            localStorage.setItem('jwtToken', data.token);
             // 2. Update the user state
             setIsLoggedIn(true);
             // 3. Update the user first name
-            setUserFirstName(username);
+            setUserFirstName(data.firstName);
+            // 4. Update the user ID
+            setUserID(data.id);
 
         } catch (error) {
             console.error('Error during login:', error);
@@ -47,6 +50,7 @@ export const UserProvider = ({ children }) => {
         isLoggedIn,
         loginError,
         userFirstName,
+        userID,
         login,
         logout
     };

@@ -4,11 +4,14 @@ import asyncio
 import json
 from concurrent.futures import ThreadPoolExecutor
 from starlette.websockets import WebSocketState
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import logger
 from app.routes.login import router as login_router
+from app.dependencies import manager
+from models import User
+from app.schemas.pydantic_users import UserOut
 
 app = FastAPI()
 
@@ -24,6 +27,7 @@ origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex='https?://.*',  # TODO REMEMBER TO CHANGE THIS IN PRODUCTION
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -86,4 +90,12 @@ async def websocket_endpoint(websocket: WebSocket):
 @app.get("/")
 def read_root():
     return {"message": "Hello, World!"}
+
+
+@app.get("/users/me")
+async def read_users_me(current_user: User = Depends(manager)):
+    """Return details of the current user."""
+    return UserOut.model_validate(current_user)
+
+
 

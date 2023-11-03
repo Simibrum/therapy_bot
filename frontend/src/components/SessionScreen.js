@@ -7,7 +7,7 @@ import MessageInput from './MessageInput';
 import therapy_room_1 from '../images/therapy_room/therapy_room_1.png';
 
 
-const SessionScreen = () => {
+const SessionScreen = (userID) => {
     const [messages, setMessages] = useState([]);
 
     const handleSendMessage = (text) => {

@@ -42,6 +42,7 @@ class User(Base):
     # Relationships
     therapist = relationship("Therapist", back_populates="user")
     chats = relationship("Chat", back_populates="user")
+    therapy_sessions = relationship("TherapySession", back_populates="user")
 
     def __init__(self, username, password_hash, email=None, role=RoleEnum.USER):
         self.username = username

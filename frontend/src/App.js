@@ -10,7 +10,7 @@ import { useUser } from './UserContext';
 
 function RoutesHandler() {
     const navigate = useNavigate();
-    const { isLoggedIn, loginError, userFirstName, login: contextLogin, logout: contextLogout } = useUser();
+    const { isLoggedIn, loginError, userFirstName, userID, login: contextLogin, logout: contextLogout } = useUser();
 
     async function handleLogin(username, password) {
         const success = await contextLogin(username, password);
@@ -35,7 +35,7 @@ function RoutesHandler() {
                 </Route>
                 <Route
                     path="/session"
-                    element={isLoggedIn ? <SessionScreen /> : <LoginScreen onLogin={handleLogin} loginError={loginError}/>} />
+                    element={isLoggedIn ? <SessionScreen userID={userID} /> : <LoginScreen onLogin={handleLogin} loginError={loginError}/>} />
                 <Route path="/" element={isLoggedIn ? <HomeScreen /> : <LoginScreen onLogin={handleLogin} loginError={loginError}/>} />
             </Routes>
 

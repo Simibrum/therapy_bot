@@ -16,6 +16,7 @@ class Chat(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
     therapist_id: Mapped[int] = mapped_column(ForeignKey('therapists.id'), nullable=False)
+    therapy_session_id: Mapped[int] = mapped_column(ForeignKey('therapy_sessions.id'), nullable=False)
     timestamp: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, default=func.now())
     # Sender is "user" or "therapist"
     sender: Mapped[str] = mapped_column(String(10), nullable=False)
@@ -27,6 +28,7 @@ class Chat(Base):
     # Relationships
     user = relationship("User", back_populates="chats")
     therapist = relationship("Therapist", back_populates="chats")
+    therapy_session = relationship("TherapySession", back_populates="chats")
 
     @hybrid_property
     def text(self) -> str:
