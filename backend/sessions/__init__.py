@@ -1,1 +1,0 @@
-"""Therapy sessions module."""

@@ -1,4 +1,4 @@
-"""Define an engine to create sessions for use within the application.
+"""Define an engine to create logic for use within the application.
 
 See https://stackoverflow.com/questions/59793920/
 how-to-make-sqlalchemy-engine-available-throughout-the-flask-application

@@ -5,7 +5,7 @@ from sqlalchemy import Enum, String, DateTime
 from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy.orm import relationship
 from enum import Enum as PyEnum
-from datetime import timedelta
+from datetime import datetime, timedelta
 from database import Base
 from utils.text_crypto import generate_encryption_key
 
@@ -102,3 +102,18 @@ class User(Base):
             "email": self.email,
             "role": self.role.value
         }
+
+    @property
+    def age(self) -> int:
+        """
+        Returns the age of the user based on the date of birth.
+
+        Returns:
+            int: The age of the user in years.
+        """
+        if self.date_of_birth:
+            today = datetime.today()
+            age = today.year - self.date_of_birth.year - (
+                        (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day))
+            return age
+        return -1

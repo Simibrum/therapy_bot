@@ -4,7 +4,7 @@ import pytest
 from pytest_mock import MockerFixture
 import numpy as np
 import math
-from sessions.therapy_session import TherapySession
+from logic.therapy_session_logic import TherapySessionLogic
 from models.chats import Chat
 
 
@@ -20,7 +20,7 @@ def mock_get_embedding(*args, **kwargs):
 def therapy_session_instance(user_instance, therapist_instance, mocker: MockerFixture):
     # Mock the OpenAI API embedding function
     mocker.patch("models.chats.get_embedding", side_effect=mock_get_embedding)
-    return TherapySession(user_instance, therapist_instance)
+    return TherapySessionLogic(user_instance.id, therapist_instance.id)
 
 
 @pytest.fixture
@@ -52,7 +52,7 @@ def test_add_chat_message(db_session_manager, therapy_session_instance):
 
 
 def test_generate_response(mocker, therapy_session_instance, db_session_manager):
-    mocker.patch("sessions.therapy_session.get_chat_completion", return_value="Hello, user!")
+    mocker.patch("logic.therapy_session_logic.get_chat_completion", return_value="Hello, user!")
     new_chat_id, response = therapy_session_instance.generate_response("Hello, therapist!")
     assert response == "Hello, user!"
     with db_session_manager.get_session() as session:

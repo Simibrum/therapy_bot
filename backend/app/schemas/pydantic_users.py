@@ -25,6 +25,7 @@ class UserOut(BaseModel):
     address: Optional[str] = None
     city: Optional[str] = None
     country: Optional[str] = None
+    age: Optional[int] = None
 
 
 class UserInDB(UserOut):

@@ -1,8 +1,9 @@
 """Configuration for testing."""
 import os
 import pytest
+from datetime import datetime
 from sqlalchemy.orm import sessionmaker
-from models import User, Therapist, Chat
+from models import User, Therapist, Chat, TherapySession
 
 from config import TestConfig
 from database import Base
@@ -70,6 +71,14 @@ def user_instance(shared_session):
         email="test@example.com"
     )
     user.set_password("hashedpassword")
+    user.first_name = "Test"
+    user.last_name = "User"
+    user.address = "Test Address"
+    user.city = "Test City"
+    user.country = "Test Country"
+    # Define a test date of birth as a datetime object
+    user.date_of_birth = datetime(1980, 1, 1)
+
     shared_session.add(user)
     shared_session.commit()
     return user
@@ -92,12 +101,25 @@ def therapist_instance(shared_session, user_instance):
 
 
 @pytest.fixture
-def chat_instance(shared_session, user_instance, therapist_instance):
+def therapy_session_instance(shared_session, user_instance, therapist_instance):
+    """Create a therapy session instance."""
+    therapy_session = TherapySession(
+        user=user_instance,
+        therapist=therapist_instance
+    )
+    shared_session.add(therapy_session)
+    shared_session.commit()
+    return therapy_session
+
+
+@pytest.fixture
+def chat_instance(shared_session, user_instance, therapist_instance, therapy_session_instance):
     """Create a chat instance."""
     chat = Chat(
         user=user_instance,
         therapist=therapist_instance,
-        sender="user"
+        sender="user",
+        therapy_session=therapy_session_instance
     )
     chat.text = "Hello, how are you?"
     shared_session.add(chat)
