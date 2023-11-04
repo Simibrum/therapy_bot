@@ -2,9 +2,11 @@
 from typing import Tuple, List
 import numpy as np
 from config import logger
-from models import Therapist, Chat, TherapySession
+from models import User, Therapist, Chat, TherapySession
+from app.schemas import UserOut, TherapistOut
 from database.db_engine import DBSessionManager
 from llm.chat_completion import get_chat_completion
+import llm.prompt_builder as prompt_builder
 
 
 class TherapySessionLogic:
@@ -45,6 +47,9 @@ class TherapySessionLogic:
             self.therapy_session_id = self.create_therapy_session()
         else:
             raise ValueError("Must provide either a user id or a pre-existing session id")
+
+        # Initialise fields to store
+        self.system_prompt = self.build_system_prompt()
 
     def get_therapy_session(self) -> TherapySession:
         """Check if the therapy session exists in the database."""
@@ -160,7 +165,16 @@ class TherapySessionLogic:
 
     def start_session(self):
         """Start a new therapy session."""
-    pass
+        pass
+
+    def build_system_prompt(self):
+        """Build the system prompt."""
+        with self.db_session_manager.get_session() as session:
+            user = session.query(User).filter(User.id == self.user_id).first()
+            therapist = session.query(Therapist).filter(Therapist.id == self.therapist_id).first()
+            user_out = UserOut.model_validate(user)
+            therapist_out = TherapistOut.model_validate(therapist)
+        return prompt_builder.build_system_prompt(user_out, therapist_out)
 
 # Usage
 # Assume user_instance and therapist_instance are SQLAlchemy model instances

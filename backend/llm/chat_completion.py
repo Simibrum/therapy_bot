@@ -4,23 +4,26 @@ from llm.common import api_request
 
 
 def get_chat_completion(
-    user_input: str,
+    next_message_prompt: str,
+    system_prompt: str,
+    history: str = None,
+    briefing_messages: list[str] = None,
     model: str = "gpt-3.5-turbo",
     temperature: float = 0.3,
     api_key: str = openai_api_key,
+
 ) -> str:
     """Get a chat completion from the OpenAI API."""
     messages = [
-        {"speaker": "user", "text": user_input},
-        {"speaker": "therapist", "text": "Hello, how are you?"},
-        {"speaker": "user", "text": "I'm doing well, how about you?"},
-        {"speaker": "therapist", "text": "I'm doing well, thanks for asking."},
-        {"speaker": "user", "text": "That's good to hear."},
-        {"speaker": "therapist", "text": "Yes, it is."},
-        {"speaker": "user", "text": "I'm going to go now, bye."},
-        {"speaker": "therapist", "text": "Okay, bye."},
+        {"role": "system", "content": system_prompt}
     ]
-    messages.append({"speaker": "user", "text": user_input})
+    if history:
+        messages.append({"role": "user", "content": history})
+    if briefing_messages:
+        messages.extend([{"role": "user", "content": message} for message in briefing_messages])
+
+    messages.append({"role": "user", "content": next_message_prompt})
+
     response = api_request(
         messages=messages,
         model=model,

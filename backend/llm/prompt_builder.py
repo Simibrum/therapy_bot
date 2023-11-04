@@ -1,6 +1,6 @@
 """Functions to build prompts for the LLM model."""
 from typing import List
-from app.schemas import UserOut, TherapistOut
+from app.schemas import UserOut, TherapistOut, ChatListOut
 
 
 def build_system_prompt(user: UserOut, therapist: TherapistOut) -> str:
@@ -50,3 +50,17 @@ def build_first_message_prompt() -> str:
     """Build the first message prompt."""
     return "[Provide a message to the user to start the therapy session.]"
 
+
+def build_recent_session_history(history: ChatListOut) -> str:
+    """Build the recent session history prompt."""
+    history_string = f"[Here is a summary of your recent session history:\n\n {ChatListOut.as_string}"
+    return history_string
+
+
+def build_next_message_prompt(user_input: str) -> str:
+    """Build the next message prompt."""
+    next_message_string = (
+        f"[The user said: {user_input}\n\n"
+        f"Provide a next message to the user to continue the therapy session.]"
+    )
+    return next_message_string
