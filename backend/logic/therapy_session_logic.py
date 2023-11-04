@@ -3,7 +3,7 @@ from typing import Tuple, List
 import numpy as np
 from config import logger
 from models import User, Therapist, Chat, TherapySession
-from app.schemas import UserOut, TherapistOut
+from app.schemas import UserOut, TherapistOut, ChatListOut
 from database.db_engine import DBSessionManager
 from llm.chat_completion import get_chat_completion
 import llm.prompt_builder as prompt_builder
@@ -80,7 +80,7 @@ class TherapySessionLogic:
             )
             return therapist_id
 
-    def get_therapy_session_messages(self) -> List[Chat]:
+    def get_therapy_session_messages(self) -> ChatListOut:
         """Get all messages in the therapy session."""
         with self.db_session_manager.get_session() as session:
             messages = (
@@ -88,8 +88,8 @@ class TherapySessionLogic:
                 .filter(Chat.therapy_session_id == self.therapy_session_id)
                 .all()
             )
-            # TODO - return as Pydantic model
-            return messages
+            chat_list_out = ChatListOut(chats=messages)
+            return chat_list_out
 
     def load_previous_chats(self):
         """Load previous chats from the database and their vectors into memory."""
@@ -139,7 +139,8 @@ class TherapySessionLogic:
 
     def generate_response(self, user_input) -> Tuple[int, str]:
         """Generate a response using the ChatCompletion API."""
-        response = get_chat_completion(user_input, self.chat_vectors)
+        next_message_prompt = prompt_builder.build_next_message_prompt(user_input)
+        response = get_chat_completion(next_message_prompt, self.system_prompt)
         new_chat_id = self.add_chat_message("therapist", response)
         return new_chat_id, response
 
@@ -176,8 +177,4 @@ class TherapySessionLogic:
             therapist_out = TherapistOut.model_validate(therapist)
         return prompt_builder.build_system_prompt(user_out, therapist_out)
 
-# Usage
-# Assume user_instance and therapist_instance are SQLAlchemy model instances
-# therapy_session = TherapySession(user_instance, therapist_instance)
-# therapy_session.load_previous_chats()
-# ...
+

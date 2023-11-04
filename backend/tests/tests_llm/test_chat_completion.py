@@ -9,7 +9,7 @@ from llm.chat_completion import get_chat_completion
 def mock_api_request(mocker):
     """Fixture to mock the api_request function."""
     mock = mocker.patch('llm.chat_completion.api_request', autospec=True)
-    mock.return_value = {"choices": [{"text": "Hello, how can I help you?"}]}
+    mock.return_value = {"choices": [{"message": {"content": "Hello, how can I help you?"}}]}
     return mock
 
 

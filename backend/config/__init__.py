@@ -2,6 +2,10 @@
 import os
 import tempfile
 from config.init_logger import logger
+from config.helper_functions import load_from_env_file
+
+# Load environment variables from .env file
+load_from_env_file()
 
 # Load API Key from environment variable
 openai_api_key = os.getenv("OPENAI_API_KEY")

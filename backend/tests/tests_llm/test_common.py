@@ -10,7 +10,7 @@ from llm.common import api_request  # Import your function from your actual modu
 @patch("llm.common.chat_completion_wrapper")
 def test_api_request(mock_chat_completion, mock_openai, monkeypatch):
     # Mocking the openai response for text-embedding model
-    mock_openai.return_value = {"data": {"embedding": [[0.1, 0.2], [0.3, 0.4]]}}
+    mock_openai.return_value = {"data": [{"embedding": [[0.1, 0.2], [0.3, 0.4]]}]}
     # Mocking the chat_completion_wrapper response for other models
     mock_chat_completion.return_value = {"some_key": "some_value"}
 

@@ -74,8 +74,8 @@ class Chat(Base):
         """Fetch the embedding for the text."""
         logger.debug(f"Fetching embedding for chat {self.id}")
         if self._encrypted_text:
-            self._vector = get_embedding(self.text)
+            self.vector = get_embedding(self.text)
         else:
-            self._vector = None
-        return self._vector
+            self.vector = None
+        return self.vector
 

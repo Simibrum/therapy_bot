@@ -30,4 +30,4 @@ def get_chat_completion(
         temperature=temperature,
         api_key=api_key
     )
-    return response["choices"][0]["text"]
+    return response["choices"][0]["message"]["content"]

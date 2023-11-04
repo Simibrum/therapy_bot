@@ -10,9 +10,6 @@ import tiktoken
 
 from config import logger, openai_api_key
 
-# Set API Key
-openai.api_key = openai_api_key
-
 # Set the OpenAI model
 MODEL = "gpt-4"
 
@@ -53,7 +50,7 @@ def api_request(
             if model.startswith("text-embedding"):
                 gen_logger.info(f"Making API request for text embedding")
                 response = openai.Embedding.create(input=text, model=model, api_key=api_key)
-                result = response['data']['embedding']
+                result = response['data'][0]['embedding']
             else:
                 gen_logger.info(f"Making API request with {model}")
                 result = chat_completion_wrapper(model, messages, temperature=temperature, api_key=api_key)

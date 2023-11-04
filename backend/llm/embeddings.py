@@ -9,7 +9,7 @@ def get_embedding(
         text: str,
         model: str = "text-embedding-ada-002",
         api_key: str = openai_api_key
-) -> List[List[float]]:
+) -> np.array:
     """
     Get the embedding for a given text using the OpenAI Embedding API.
 
@@ -20,9 +20,10 @@ def get_embedding(
             variable.
 
     Returns:
-        A list of embeddings corresponding to the input text, each embedding is a list of floats.
+        An embedding as a numpy array.
     """
-    return api_request(text=text, messages=[], model=model, api_key=api_key)
+    vector_result = api_request(text=text, messages=[], model=model, api_key=api_key)
+    return np.array(vector_result)
 
 
 def compute_cosine_similarities(query_embedding: np.array, embeddings_matrix: np.array):
