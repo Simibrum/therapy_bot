@@ -1,7 +1,5 @@
 """Test the websocket API connection."""
 import pytest
-import json
-import websockets
 from fastapi.testclient import TestClient
 from fastapi import WebSocketDisconnect
 from app.main import app
@@ -17,6 +15,11 @@ def test_websocket_auth_connection(therapy_session_instance, user_instance):
         response = websocket.receive_text()
         assert response == "Valid token"
 
+        initial_messages = websocket.receive_json()
+        assert initial_messages
+        assert "messages" in initial_messages
+        assert len(initial_messages["messages"]) == 1
+
 
 def test_websocket_no_auth_connection(therapy_session_instance):
     endpoint_string = f"/ws/session/{therapy_session_instance.id}"
@@ -24,23 +27,8 @@ def test_websocket_no_auth_connection(therapy_session_instance):
         websocket.send_json({"message": "any old thing"})
         response = websocket.receive_text()
         assert response == "Invalid token"
+        # Check websocket is closed
+        with pytest.raises(WebSocketDisconnect):
+            websocket.receive_text()
 
-@pytest.mark.asyncio
-async def test_async_websocket_connection(therapy_session_instance):
-    endpoint_string = f"/ws/session/{therapy_session_instance.id}"
-    async with websockets.connect(endpoint_string) as websocket:
-        # Receive the initial data sent back after the connection is established
-        initial_data = await websocket.recv()
-        # Deserialize the received data to a Python data structure (assuming it's sent as JSON)
-        initial_data = json.loads(initial_data)
-
-        # data = {"query": "What is the meaning of life?"}
-        # websocket.send_json(data)
-        # response = websocket.receive_json()
-        # expected_response = {
-        #     'query': 'What is the meaning of life?',
-        #     'result': None,
-        #     'state': 'PROCESSING'
-        # }
-        # assert response == expected_response
 

@@ -24,15 +24,16 @@ class TherapySessionLogic:
         self.index_to_id = {}  # Dictionary to map chat matrix index to chat id
         # Load or create new therapy session
         if pre_existing_session_id:
+            self.therapy_session_id = pre_existing_session_id
             logger.info("Using pre-existing therapy session")
             # Check the therapy session exists in the DB
             therapy_session = self.get_therapy_session()
             if not therapy_session:
                 raise ValueError("Therapy session does not exist")
             self.therapy_session_id = pre_existing_session_id
-            if therapy_session.user_id != user_id:
+            if user_id and therapy_session.user_id != user_id:
                 raise ValueError("User id does not match")
-            if therapy_session.therapist_id != therapist_id:
+            if therapist_id and therapy_session.therapist_id != therapist_id:
                 raise ValueError("Therapist id does not match")
             self.user_id = therapy_session.user_id
             self.therapist_id = therapy_session.therapist_id
@@ -99,7 +100,7 @@ class TherapySessionLogic:
                 .filter(Chat.therapy_session_id == self.therapy_session_id)
                 .all()
             )
-            chat_list_out = ChatListOut(chats=messages)
+            chat_list_out = ChatListOut(messages=messages)
             return chat_list_out
 
     def load_all_session_previous_chats(self):

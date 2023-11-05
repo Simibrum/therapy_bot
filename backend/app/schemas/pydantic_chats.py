@@ -13,7 +13,7 @@ class ChatOut(BaseModel):
     therapy_session_id: int
     user_id: Optional[int] = None
     therapist_id: Optional[int] = None
-    message: str
+    text: str
     sender: str
     timestamp: datetime.datetime
 
@@ -24,7 +24,7 @@ class ChatOut(BaseModel):
 
 class ChatListOut(BaseModel):
     """Wrapper for list of chats."""
-    chats: list[ChatOut]
+    messages: list[ChatOut]
 
     def as_string(self):
         """Return all chats as a string."""
