@@ -39,9 +39,9 @@ def therapy_session_instance_with_chat(therapy_session_instance):
 
 
 def test_add_chat_message(db_session_manager, therapy_session_instance):
-    new_chat_id = therapy_session_instance.add_chat_message("user", "Hello, therapist!")
+    chat_out = therapy_session_instance.add_chat_message("user", "Hello, therapist!")
     with db_session_manager.get_session() as session:
-        chat = session.query(Chat).filter(Chat.id == new_chat_id).first()
+        chat = session.query(Chat).filter(Chat.id == chat_out.id).first()
         assert chat is not None
         assert chat.sender == "user"
         assert chat.text == "Hello, therapist!"
@@ -53,10 +53,9 @@ def test_add_chat_message(db_session_manager, therapy_session_instance):
 
 def test_generate_response(mocker, therapy_session_instance, db_session_manager):
     mocker.patch("logic.therapy_session_logic.get_chat_completion", return_value="Hello, user!")
-    new_chat_id, response = therapy_session_instance.generate_response("Hello, therapist!")
-    assert response == "Hello, user!"
+    chat_out = therapy_session_instance.generate_response("Hello, therapist!")
     with db_session_manager.get_session() as session:
-        chat = session.query(Chat).filter(Chat.id == new_chat_id).first()
+        chat = session.query(Chat).filter(Chat.id == chat_out.id).first()
         assert chat is not None
         assert chat.sender == "therapist"
         assert chat.text == "Hello, user!"

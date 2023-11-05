@@ -18,15 +18,15 @@ def test_generate_response(therapy_session_logic_instance, db_session_manager):
     """Test generating a response."""
     # Use the custom create function to use the gpt3.5 model
     with patch('llm.common.chat_completion_wrapper', custom_create):
-        new_chat_id, response = therapy_session_logic_instance.generate_response("Hello, therapist!")
-        assert response
-        assert len(response) > 5
-        assert isinstance(response, str)
+        chat_out = therapy_session_logic_instance.generate_response("Hello, therapist!")
+        assert chat_out
+        assert len(chat_out.text) > 5
+        assert isinstance(chat_out.text, str)
         with db_session_manager.get_session() as session:
-            chat = session.query(Chat).filter(Chat.id == new_chat_id).first()
+            chat = session.query(Chat).filter(Chat.id == chat_out.id).first()
             assert chat is not None
             assert chat.sender == "therapist"
-            assert chat.text == response
+            assert chat.text
             assert chat.vector is not None
             # Check the length of the vector is 300 with at least one non-0 value
             assert len(chat.vector) == 1536

@@ -12,7 +12,7 @@ def chat_out_instance():
         therapy_session_id=1,
         user_id=1,
         therapist_id=None,
-        message="Hello!",
+        text="Hello!",
         sender="user",
         timestamp=datetime.datetime(2023, 11, 3, 10, 0, 0)
     )
@@ -21,7 +21,7 @@ def chat_out_instance():
 @pytest.fixture
 def chat_list_out_instance(chat_out_instance):
     """Fixture to create a ChatListOut instance."""
-    return ChatListOut(chats=[chat_out_instance, chat_out_instance])
+    return ChatListOut(messages=[chat_out_instance, chat_out_instance])
 
 
 def test_chat_out_as_string(chat_out_instance):

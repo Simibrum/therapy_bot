@@ -19,7 +19,7 @@ class ChatOut(BaseModel):
 
     def as_string(self):
         """Return the Chat output as a string."""
-        return f"{self.sender}: {self.message}\n({self.timestamp})"
+        return f"{self.sender}: {self.text}\n({self.timestamp})"
 
 
 class ChatListOut(BaseModel):
@@ -28,4 +28,4 @@ class ChatListOut(BaseModel):
 
     def as_string(self):
         """Return all chats as a string."""
-        return "\n\n".join([chat.as_string() for chat in self.chats])
+        return "\n\n".join([chat.as_string() for chat in self.messages])
