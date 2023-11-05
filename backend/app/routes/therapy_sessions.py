@@ -1,45 +1,68 @@
 """Routes for Therapy Sessions."""
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Union
+from fastapi import APIRouter, Depends, HTTPException, status
 from starlette.websockets import WebSocket
 
-from app.dependencies import manager
-from app.main import app
-from database import get_db
-from sqlalchemy.orm import Session
-from models import User, Therapist, TherapySession
+from config import logger
+from app.dependencies import manager, query_user
+from models import User
+from logic.therapy_session_logic import TherapySessionLogic
 
 router = APIRouter()
 
 
+def verify_token(token: str) -> Union[User, None]:
+    """Verify the token and return the user."""
+    user = manager.get_current_user(token)
+    return user
+
+
 @router.post("/new_session/")
-async def new_session(therapist_id: int, db: Session = Depends(get_db), current_user: User = Depends(manager)):
-
-    therapist = db.query(Therapist).filter(Therapist.id == therapist_id).first()
-    if not current_user or not therapist:
-        raise HTTPException(status_code=404, detail="User or Therapist not found")
-
-    new_therapy_session = TherapySession(user_id=current_user.id, therapist_id=therapist_id)
-    db.add(new_therapy_session)
-    db.commit()
-
-    return {"session_id": new_therapy_session.id}
+async def new_session(current_user: User = Depends(manager)):
+    """Create a new therapy session."""
+    if not current_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    # Create a new therapy session using the logic module
+    new_therapy_session = TherapySessionLogic(user_id=current_user.id)
+    return {"session_id": new_therapy_session.therapy_session_id}
 
 
-@app.websocket("/ws/session/{therapy_session_id}")
+@router.websocket("/ws/session/{therapy_session_id}")
 async def websocket_endpoint(
         websocket: WebSocket,
-        therapy_session_id: int,
-        db: Session = Depends(get_db),
-        current_user: User = Depends(manager)):
+        therapy_session_id: int
+):
+    """Websocket endpoint for the therapy session."""
     await websocket.accept()
-    # Get the therapy session
-    therapy_session = db.query(TherapySession).filter(TherapySession.id == therapy_session_id).first()
-    if not therapy_session:
-        raise HTTPException(status_code=404, detail="Therapy session not found")
-    # Send initial therapist message
-    await websocket.send_json({"therapist": "Hello! How can I help you today?"})
-    while True:
-        data = await websocket.receive_text()
-        # Process user message and generate therapist response
-        response = process_user_message(data)
-        await websocket.send_json({"therapist": response})
+
+    token_json = await websocket.receive_json()
+    token = token_json.get("access_token")
+    if token:
+        logger.info("Token received")
+        current_user = verify_token(token)
+    else:
+        logger.info("No token received")
+        current_user = None
+    if not current_user:
+        await websocket.send_text("Invalid token")
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+    else:
+        await websocket.send_text("Valid token")
+
+    # while True:
+    #     # Get the therapy session - TODO needs to be async
+    #     therapy_session = TherapySessionLogic(pre_existing_session_id=therapy_session_id)
+    #     if not therapy_session:
+    #         raise HTTPException(status_code=404, detail="Therapy session not found")
+    #     # Get existing or initial chat messages  - TODO needs to be async
+    #     messages_to_send = therapy_session.get_messages()
+    #     # Send initial therapist message
+    #     await websocket.send_json(messages_to_send)
+    #
+    #     data = await websocket.receive_text()
+    #     # Process user message and generate therapist response - TODO needs to be async
+    #     chat_out = therapy_session.generate_response(data)
+    #     # Send therapist response
+    #     await websocket.send_json(chat_out)
+

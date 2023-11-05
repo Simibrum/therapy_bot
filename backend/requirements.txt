@@ -15,6 +15,7 @@ cryptography
 pytest
 pytest-cov
 pytest-mock
+pytest-asyncio
 
 # XML Parsing
 beautifulsoup4

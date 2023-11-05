@@ -6,6 +6,8 @@ from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy.orm import relationship
 from enum import Enum as PyEnum
 from datetime import datetime, timedelta
+
+from config import logger
 from database import Base
 from utils.text_crypto import generate_encryption_key
 

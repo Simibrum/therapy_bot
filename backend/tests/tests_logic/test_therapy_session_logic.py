@@ -68,7 +68,7 @@ def test_generate_response(mocker, therapy_session_instance, db_session_manager)
 
 def test_load_previous_chats(therapy_session_instance_with_chat):
     """Test loading previous chats from the database."""
-    therapy_session_instance_with_chat.load_previous_chats()
+    therapy_session_instance_with_chat.load_all_session_previous_chats()
     assert len(therapy_session_instance_with_chat.chat_vectors) == 1
     assert therapy_session_instance_with_chat.chat_vectors is not None
     # The size of the chat vectors matrix should be 1 x 300
@@ -76,7 +76,7 @@ def test_load_previous_chats(therapy_session_instance_with_chat):
 
 
 def test_cosine_similarity_search(therapy_session_instance_with_chat):
-    therapy_session_instance_with_chat.load_previous_chats()
+    therapy_session_instance_with_chat.load_all_session_previous_chats()
     query_vector = therapy_session_instance_with_chat.chat_vectors[0]
     similarity_scores = therapy_session_instance_with_chat.cosine_similarity_search(query_vector)
     assert len(similarity_scores) == 1
@@ -84,7 +84,7 @@ def test_cosine_similarity_search(therapy_session_instance_with_chat):
 
 
 def test_get_relevant_past_chats(therapy_session_instance_with_chat):
-    therapy_session_instance_with_chat.load_previous_chats()
+    therapy_session_instance_with_chat.load_all_session_previous_chats()
     query_vector = therapy_session_instance_with_chat.chat_vectors[0]
     relevant_chat_ids = therapy_session_instance_with_chat.get_relevant_past_chat_ids(query_vector)
     assert len(relevant_chat_ids) == 1

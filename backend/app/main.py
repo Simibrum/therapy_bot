@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from config import logger
 from app.routes.login import router as login_router
+from app.routes.therapy_sessions import router as therapy_sessions_router
 from app.dependencies import manager
 from models import User
 from app.schemas.pydantic_users import UserOut
@@ -37,6 +38,8 @@ executor = ThreadPoolExecutor()
 
 # Add the login router
 app.include_router(login_router)
+# Add the therapy sessions router
+app.include_router(therapy_sessions_router)
 
 
 def slow_function(query: str) -> str:
@@ -50,7 +53,7 @@ async def run_in_executor(func, *args):
     return await loop.run_in_executor(executor, func, *args)
 
 
-@app.websocket("/ws")
+@app.websocket("/ws_old/")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     try:
