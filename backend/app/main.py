@@ -3,16 +3,16 @@
 import asyncio
 import json
 from concurrent.futures import ThreadPoolExecutor
-from starlette.websockets import WebSocketState
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends
-from fastapi.middleware.cors import CORSMiddleware
 
-from config import logger
+from app.dependencies import manager
 from app.routes.login import router as login_router
 from app.routes.therapy_sessions import router as therapy_sessions_router
-from app.dependencies import manager
-from models import User
 from app.schemas.pydantic_users import UserOut
+from config import logger, FRONTEND_URL
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from models import User
+from starlette.websockets import WebSocketState
 
 app = FastAPI()
 
@@ -22,6 +22,7 @@ origins = [
     "http://192.168.32.2:3000",
     "http://172.29.0.3:3000",
     "http://172.29.0.2:3000",
+    FRONTEND_URL
     # Add any other origins you might have
 ]
 

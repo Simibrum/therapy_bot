@@ -1,8 +1,9 @@
 """Configuration for the backend."""
 import os
 import tempfile
-from config.init_logger import logger
+
 from config.helper_functions import load_from_env_file
+from config.init_logger import logger
 
 # Load environment variables from .env file
 load_from_env_file()
@@ -12,6 +13,9 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 
 # Generate a secret key for the JWT
 SECRET_KEY = os.getenv("SECRET_KEY", "dummy_secret_key")
+
+# Get Frontend URL
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 # Set the token time out value
 ACCESS_TOKEN_EXPIRE_MINUTES = 30

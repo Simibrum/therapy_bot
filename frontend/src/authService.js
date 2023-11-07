@@ -3,6 +3,7 @@
 export async function handleLogin(username, password) {
   const backendURL = process.env.REACT_APP_BACKEND_URL;
   const apiUrl = backendURL + '/login';
+  //const apiUrl = "/login"
 
   try {
     const response = await fetch(apiUrl, {

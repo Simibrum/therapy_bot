@@ -9,12 +9,16 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       DEBUG_MODE: "False"
       CONFIG_ENV: "production"
+      FRONTEND_URL: ${FRONTEND_URL}
     ports:
       - "8000:80"
     # Need to define volumes for cached embeddings and parser
 
   frontend:
     image: therapy_bot_frontend:latest
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        - REACT_APP_BACKEND_URL=${BACKEND_URL}
     ports:
       - "3000:80"

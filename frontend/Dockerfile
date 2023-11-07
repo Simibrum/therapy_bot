@@ -14,6 +14,12 @@ RUN npm install
 # Copy the current directory contents into the container at /app
 COPY . .
 
+# Set the argument for the build-time environment variable
+ARG REACT_APP_BACKEND_URL
+
+# Set the build-time environment variable that will be used by React
+ENV REACT_APP_BACKEND_URL=$REACT_APP_BACKEND_URL
+
 # Build the React app
 RUN npm run build
 
