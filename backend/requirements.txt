@@ -29,6 +29,6 @@ black
 
 # QA / Agent functionality
 langchain
-openai
+openai>=1.2.0
 tiktoken
 numpy

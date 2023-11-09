@@ -67,8 +67,14 @@ const SessionScreen = () => {
                 ws.close();
             } else {
                 // Handle JSON messages here
-                const parsedMessage = JSON.parse(message);
-                console.log("Received message: ", parsedMessage);
+                const parsedObjects = JSON.parse(message);
+                console.log("Received messages: ", parsedObjects);
+                // Append the messages to the chat
+                const newMessages = parsedObjects.messages.map((obj) => {
+                    return {sender: obj.sender, text: obj.text};
+                });
+                setMessages([...messages, ...newMessages]);
+                console.log("Messages: ", messages);
             }
         };
 
@@ -87,7 +93,7 @@ const SessionScreen = () => {
         return () => {
             ws.close();
         };
-    }, [sessionID, user.token]);
+    }, [sessionID, user.token, messages]);
 
     // Effect to start a new session when the component mounts
     useEffect(() => {

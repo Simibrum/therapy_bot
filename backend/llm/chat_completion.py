@@ -1,5 +1,4 @@
 """Functions to handle chat completion."""
-from config import openai_api_key
 from llm.common import api_request
 
 
@@ -10,8 +9,6 @@ def get_chat_completion(
     briefing_messages: list[str] = None,
     model: str = "gpt-3.5-turbo",
     temperature: float = 0.3,
-    api_key: str = openai_api_key,
-
 ) -> str:
     """Get a chat completion from the OpenAI API."""
     messages = [
@@ -27,7 +24,6 @@ def get_chat_completion(
     response = api_request(
         messages=messages,
         model=model,
-        temperature=temperature,
-        api_key=api_key
+        temperature=temperature
     )
-    return response["choices"][0]["message"]["content"]
+    return response

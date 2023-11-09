@@ -1,6 +1,6 @@
 """LLM embedding functions."""
-from typing import List
 import numpy as np
+
 from config import openai_api_key
 from llm.common import api_request
 
@@ -22,7 +22,7 @@ def get_embedding(
     Returns:
         An embedding as a numpy array.
     """
-    vector_result = api_request(text=text, messages=[], model=model, api_key=api_key)
+    vector_result = api_request(text=text, messages=[], model=model)
     return np.array(vector_result)
 
 

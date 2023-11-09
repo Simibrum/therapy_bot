@@ -1,27 +1,29 @@
 """Common functions for GPT generation."""
-from typing import List
-from logging import Logger
-import os
 import random
 import time
+from logging import Logger
+from typing import List
 
-import openai
 import tiktoken
+from openai import OpenAI
 
 from config import logger, openai_api_key
 
 # Set the OpenAI model
 MODEL = "gpt-4"
 
+client = OpenAI(api_key=openai_api_key)
 
-def chat_completion_wrapper(model, messages, temperature: float = 0.7, api_key: str = openai_api_key):
+
+# TODO Switch to ASync Client
+def chat_completion_wrapper(model, messages, temperature: float = 0.7):
     """Wrap the openai chat completion API to allow test substitution."""
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model=model,
         messages=messages,
-        temperature=temperature,
-        api_key=api_key
+        temperature=temperature
     )
+    response = response.choices[0].message.content
     return response
 
 
@@ -30,9 +32,8 @@ def api_request(
         messages: List[dict] = None,
         model: str = MODEL,
         temperature: float = 0.7,
-        api_key: str = openai_api_key,
         gen_logger: Logger = logger
-) -> List[List[float]] | dict:
+) -> List[List[float]] | str:
     """Make a request to the openai api."""
     max_tries = 5
     initial_delay = 1
@@ -49,12 +50,11 @@ def api_request(
             # gen_logger.info(f"Making API request with {model}")
             if model.startswith("text-embedding"):
                 gen_logger.info(f"Making API request for text embedding")
-                response = openai.Embedding.create(input=text, model=model, api_key=api_key)
-                result = response['data'][0]['embedding']
+                response = client.embeddings.create(input=text, model=model)
+                result = response.data[0].embedding
             else:
                 gen_logger.info(f"Making API request with {model}")
-                result = chat_completion_wrapper(model, messages, temperature=temperature, api_key=api_key)
-
+                result = chat_completion_wrapper(model, messages, temperature=temperature)
             return result
         except Exception as e:
             if attempt == max_tries:
