@@ -1,5 +1,5 @@
 // Provide UserContext to the entire app by wrapping the App component in UserContext
-import React, { createContext, useContext, useState } from 'react';
+import React, {createContext, useContext, useState} from 'react';
 import {handleLogin} from "./authService";
 
 const UserContext = createContext();
@@ -14,13 +14,15 @@ export const UserProvider = ({ children }) => {
     const [loginError, setLoginError] = useState(null);
     const [userFirstName, setUserFirstName] = useState(null);
     const [userID, setUserID] = useState(null);
+    const [userToken, setUserToken] = useState(null);
 
     async function login(username, password) {
 
         try {
             const data = await handleLogin(username, password);
-            // 1. Store the JWT token in localStorage
+            // 1. Store the JWT token in localStorage and set the token in state
             localStorage.setItem('jwtToken', data.token);
+            setUserToken(data.token);
             // 2. Update the user state
             setIsLoggedIn(true);
             // 3. Update the user first name
@@ -46,13 +48,18 @@ export const UserProvider = ({ children }) => {
         setIsLoggedIn(false);
     }
 
-    const contextValue = {
+    const user = {
         isLoggedIn,
-        loginError,
-        userFirstName,
-        userID,
+        firstName: userFirstName,
+        id: userID,
+        token: userToken,
+        error: loginError,
         login,
         logout
+    };
+
+    const contextValue = {
+        user
     };
 
     return (

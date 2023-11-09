@@ -1,12 +1,12 @@
 """Therapy session class to model a therapy session."""
-from typing import Tuple, List
 import numpy as np
-from config import logger
-from models import User, Therapist, Chat, TherapySession
+
+import llm.prompt_builder as prompt_builder
 from app.schemas import UserOut, TherapistOut, ChatOut, ChatListOut
+from config import logger
 from database.db_engine import DBSessionManager
 from llm.chat_completion import get_chat_completion
-import llm.prompt_builder as prompt_builder
+from models import User, Therapist, Chat, TherapySession
 
 
 class TherapySessionLogic:
@@ -85,12 +85,12 @@ class TherapySessionLogic:
     def get_therapist_id(self):
         """Get the therapist id."""
         with self.db_session_manager.get_session() as session:
-            therapist_id = (
+            therapist = (
                 session.query(Therapist)
                 .filter(Therapist.user_id == self.user_id)
                 .first()
             )
-            return therapist_id
+            return therapist.id
 
     def get_therapy_session_messages(self) -> ChatListOut:
         """Get all messages in the therapy session."""

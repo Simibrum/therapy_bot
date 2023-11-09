@@ -1,7 +1,5 @@
 """Test the login."""
 
-from fastapi.testclient import TestClient
-
 
 def test_login(test_client, user_instance):
     """Test the login."""

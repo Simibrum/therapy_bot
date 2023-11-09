@@ -1,12 +1,16 @@
 """Routes for Therapy Sessions."""
 from typing import Union
+
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 from starlette.websockets import WebSocket, WebSocketState, WebSocketDisconnect
 
+from app.dependencies import manager
+from app.schemas.pydantic_therapy_sessions import TherapySessionListOut
 from config import logger
-from app.dependencies import manager, query_user
-from models import User
+from database import get_db
 from logic.therapy_session_logic import TherapySessionLogic
+from models import User
 
 router = APIRouter()
 
@@ -18,8 +22,19 @@ def verify_token(token: str) -> Union[User, None]:
     return user
 
 
-@router.post("/new_session/")
-async def new_session(current_user: User = Depends(manager)):
+@router.get("/sessions")
+def get_sessions(session: Session = Depends(get_db), current_user: User = Depends(manager)) -> TherapySessionListOut:
+    """Get all therapy sessions for the current user."""
+    if not current_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    # Add the user to the session
+    session.add(current_user)
+    # Get all therapy sessions for the current user
+    return TherapySessionListOut(sessions=current_user.therapy_sessions)
+
+
+@router.post("/sessions/new")
+def new_session(current_user: User = Depends(manager)):
     """Create a new therapy session."""
     if not current_user:
         raise HTTPException(status_code=404, detail="User not found")

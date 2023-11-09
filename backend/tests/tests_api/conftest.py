@@ -10,3 +10,10 @@ def test_client():
     from fastapi.testclient import TestClient
     return TestClient(app)
 
+
+@pytest.fixture(scope="function")
+def authenticated_test_client(test_client, user_instance):
+    """Get the test client with an authenticated user."""
+    token = user_instance.create_access_token()
+    test_client.headers.update({"Authorization": f"Bearer {token}"})
+    return test_client
