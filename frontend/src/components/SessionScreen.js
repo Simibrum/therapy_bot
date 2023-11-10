@@ -1,5 +1,5 @@
 // Therapy Session UI
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Col, Container, Row} from 'react-bootstrap';
 import {useParams} from 'react-router-dom';
 import Message from './Message';
@@ -15,15 +15,15 @@ const SessionScreen = () => {
     const {sessionID} = useParams();
     const {user} = useUser(); // Retrieve user information and token from context
 
-    const [webSocket, setWebSocket] = useState(null);
     const [messages, setMessages] = useState([]);
+    const webSocketRef = useRef(null);
 
     const handleSendMessage = (text) => {
         // Append user message to the chat
         setMessages([...messages, {sender: "user", text}]);
         // Send to backend
-        if (webSocket && webSocket.readyState === WebSocket.OPEN) {
-            webSocket.send(JSON.stringify({message: text}));
+        if (webSocketRef.current && webSocketRef.current.readyState === WebSocket.OPEN) {
+            webSocketRef.current.send(JSON.stringify({message: text}));
         }
         // TODO: Send the message to the backend using WebSocket
         // After receiving a response from the backend, append the therapist's message
@@ -32,9 +32,12 @@ const SessionScreen = () => {
 
     // Function to initialize WebSocket connection
     const initWebSocket = useCallback(() => {
-        if (!sessionID) return;
+        if (!sessionID || webSocketRef.current) return;
 
+        console.log("Initializing WebSocket connection");
         const ws = new WebSocket(`${websocketURL}/ws/session/${sessionID}`);
+        console.log("Setting websocket as reference.")
+        webSocketRef.current = ws;
 
         ws.onopen = () => {
             console.log('WebSocket Connected');
@@ -42,6 +45,7 @@ const SessionScreen = () => {
         };
 
         ws.onmessage = (event) => {
+            console.log("Received message: ", event.data);
             const message = event.data;
             if (message === "Valid token") {
                 console.log("Token validated");
@@ -54,11 +58,13 @@ const SessionScreen = () => {
                 const parsedObjects = JSON.parse(message);
                 console.log("Received messages: ", parsedObjects);
                 // Append the messages to the chat
-                const newMessages = parsedObjects.messages.map((obj) => {
-                    return {sender: obj.sender, text: obj.text};
-                });
-                setMessages([...messages, ...newMessages]);
-                console.log("Messages: ", messages);
+                console.log("Appending messages to the chat");
+                setMessages(
+                    currentMessages => [
+                        ...currentMessages,
+                        ...parsedObjects.messages.map(obj => ({sender: obj.sender, text: obj.text}))
+                    ]
+                );
             }
         };
 
@@ -71,13 +77,13 @@ const SessionScreen = () => {
             console.error("WebSocket Error: ", error);
         };
 
-        setWebSocket(ws);
 
         // Cleanup on component unmount
         return () => {
             ws.close();
+            webSocketRef.current = null;
         };
-    }, [sessionID, user.token, messages]);
+    }, [sessionID, user.token]);
 
     // Effect to initialize WebSocket connection once we have a session ID
     useEffect(() => {

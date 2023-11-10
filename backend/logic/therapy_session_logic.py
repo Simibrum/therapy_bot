@@ -92,17 +92,6 @@ class TherapySessionLogic:
             )
             return therapist.id
 
-    def get_therapy_session_messages(self) -> ChatListOut:
-        """Get all messages in the therapy session."""
-        with self.db_session_manager.get_session() as session:
-            messages = (
-                session.query(Chat)
-                .filter(Chat.therapy_session_id == self.therapy_session_id)
-                .all()
-            )
-            chat_list_out = ChatListOut(messages=messages)
-            return chat_list_out
-
     def load_all_session_previous_chats(self):
         """Load previous chats from the database and their vectors into memory."""
         with self.db_session_manager.get_session() as session:
@@ -150,13 +139,6 @@ class TherapySessionLogic:
                 ) if self.chat_vectors is not None else new_chat.vector
             return chat_out
 
-    def generate_response(self, user_input) -> ChatOut:
-        """Generate a response using the ChatCompletion API."""
-        next_message_prompt = prompt_builder.build_next_message_prompt(user_input)
-        response = get_chat_completion(next_message_prompt, self.system_prompt)
-        chat_out = self.add_chat_message("therapist", response)
-        return chat_out
-
     def cosine_similarity_search(self, query_vector):
         """Perform a cosine similarity search on the chat vectors."""
         if self.chat_vectors is None:
@@ -177,6 +159,26 @@ class TherapySessionLogic:
                 relevant_chat_ids.append((self.index_to_id[index], score))
         return relevant_chat_ids
 
+    def build_system_prompt(self):
+        """Build the system prompt."""
+        with self.db_session_manager.get_session() as session:
+            user = session.query(User).filter(User.id == self.user_id).first()
+            therapist = session.query(Therapist).filter(Therapist.id == self.therapist_id).first()
+            user_out = UserOut.model_validate(user)
+            therapist_out = TherapistOut.model_validate(therapist)
+        return prompt_builder.build_system_prompt(user_out, therapist_out)
+
+    def get_therapy_session_messages(self) -> ChatListOut:
+        """Get all messages in the therapy session."""
+        with self.db_session_manager.get_session() as session:
+            messages = (
+                session.query(Chat)
+                .filter(Chat.therapy_session_id == self.therapy_session_id)
+                .all()
+            )
+            chat_list_out = ChatListOut(messages=messages)
+            return chat_list_out
+
     def start_session(self) -> ChatListOut:
         """Start a new therapy session and return initial messages."""
         # Build briefing messages for first session
@@ -189,14 +191,14 @@ class TherapySessionLogic:
         self.add_chat_message("therapist", response)
         return self.get_therapy_session_messages()
 
-    def build_system_prompt(self):
-        """Build the system prompt."""
-        with self.db_session_manager.get_session() as session:
-            user = session.query(User).filter(User.id == self.user_id).first()
-            therapist = session.query(Therapist).filter(Therapist.id == self.therapist_id).first()
-            user_out = UserOut.model_validate(user)
-            therapist_out = TherapistOut.model_validate(therapist)
-        return prompt_builder.build_system_prompt(user_out, therapist_out)
+    def generate_response(self, user_input) -> ChatListOut:
+        """Generate a response using the ChatCompletion API."""
+        # Add the user input to the chat history
+        self.add_chat_message("user", user_input)
+        next_message_prompt = prompt_builder.build_next_message_prompt(user_input)
+        response = get_chat_completion(next_message_prompt, self.system_prompt)
+        chat_out = self.add_chat_message("therapist", response)
+        return ChatListOut(messages=[chat_out])
 
     def get_messages(self) -> ChatListOut:
         """Get existing messages or start a new session."""
