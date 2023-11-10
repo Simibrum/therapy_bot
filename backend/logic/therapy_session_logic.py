@@ -193,10 +193,13 @@ class TherapySessionLogic:
 
     def generate_response(self, user_input) -> ChatListOut:
         """Generate a response using the ChatCompletion API."""
+        # Get the history
+        history = prompt_builder.build_recent_session_history(self.get_therapy_session_messages())
         # Add the user input to the chat history
         self.add_chat_message("user", user_input)
         next_message_prompt = prompt_builder.build_next_message_prompt(user_input)
-        response = get_chat_completion(next_message_prompt, self.system_prompt)
+        # This needs to use the history to prevent "Hello [User]" being repeated
+        response = get_chat_completion(next_message_prompt, self.system_prompt, history=history)
         chat_out = self.add_chat_message("therapist", response)
         return ChatListOut(messages=[chat_out])
 

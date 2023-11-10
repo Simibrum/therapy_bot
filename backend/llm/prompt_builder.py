@@ -1,5 +1,6 @@
 """Functions to build prompts for the LLM model."""
 from typing import List
+
 from app.schemas import UserOut, TherapistOut, ChatListOut
 
 
@@ -60,7 +61,9 @@ def build_recent_session_history(history: ChatListOut) -> str:
 def build_next_message_prompt(user_input: str) -> str:
     """Build the next message prompt."""
     next_message_string = (
-        f"[The user said: {user_input}\n\n"
-        f"Provide a next message to the user to continue the therapy session.]"
+        f"[The user last said: {user_input}\n\n"
+        f"Provide a next message to the user to continue the therapy session."
+        f"(OMIT \"Therapist: \" from the start of your message.) "
+        f"]"
     )
     return next_message_string

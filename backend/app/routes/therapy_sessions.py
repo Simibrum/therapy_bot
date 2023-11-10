@@ -83,9 +83,10 @@ async def websocket_endpoint(
 
         while True:
             logger.info("Entering Chat While Loop - Waiting for message")
-            data = await websocket.receive_text()
+            data = await websocket.receive_json()
+            user_text = data.get("message")
             # Process user message and generate therapist response - TODO needs to be async
-            messages_to_send = therapy_session.generate_response(data)
+            messages_to_send = therapy_session.generate_response(user_text)
             # Send therapist response
             await websocket.send_json(messages_to_send.model_dump(mode='json'))
     except WebSocketDisconnect:
