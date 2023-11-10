@@ -10,6 +10,7 @@ websockets
 # Database
 sqlalchemy
 cryptography
+alembic
 
 # Testing
 pytest

@@ -1,17 +1,20 @@
 // Therapy Session UI
 import React, {useCallback, useEffect, useState} from 'react';
 import {Col, Container, Row} from 'react-bootstrap';
+import {useParams} from 'react-router-dom';
 import Message from './Message';
 import MessageInput from './MessageInput';
 import {useUser} from '../UserContext';
-import {backendURL, websocketURL} from "../config";
+import {websocketURL} from "../config";
 
 import therapy_room_1 from '../images/therapy_room/therapy_room_1.png';
 
 
 const SessionScreen = () => {
+    // Get the session ID from the URL
+    const {sessionID} = useParams();
     const {user} = useUser(); // Retrieve user information and token from context
-    const [sessionID, setSessionID] = useState(null);
+
     const [webSocket, setWebSocket] = useState(null);
     const [messages, setMessages] = useState([]);
 
@@ -26,25 +29,6 @@ const SessionScreen = () => {
         // After receiving a response from the backend, append the therapist's message
         // Example: setMessages([...messages, { sender: "therapist", text: "Response from backend" }]);
     };
-
-    // Function to establish a new therapy session
-    const startNewSession = useCallback(async () => {
-        console.log("Starting new session")
-        try {
-            const response = await fetch(`${backendURL}/sessions/new`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${user.token}`, // Assuming the token is stored in user context
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ /* data if needed */})
-            });
-            const data = await response.json();
-            setSessionID(data.session_id);
-        } catch (error) {
-            console.error("Error starting new session: ", error);
-        }
-    }, [user.token]);
 
     // Function to initialize WebSocket connection
     const initWebSocket = useCallback(() => {
@@ -94,11 +78,6 @@ const SessionScreen = () => {
             ws.close();
         };
     }, [sessionID, user.token, messages]);
-
-    // Effect to start a new session when the component mounts
-    useEffect(() => {
-        startNewSession();
-    }, [startNewSession]);
 
     // Effect to initialize WebSocket connection once we have a session ID
     useEffect(() => {

@@ -5,6 +5,7 @@ import {BrowserRouter as Router, Route, Routes, useNavigate} from 'react-router-
 import HomeScreen from "./components/HomeScreen";
 import LoginScreen from "./components/LoginScreen";
 import SessionScreen from './components/SessionScreen';
+import SessionsList from "./components/SessionsList";
 import TopNavbar from './components/TopNavbar';
 import {useUser} from './UserContext';
 
@@ -36,7 +37,11 @@ function RoutesHandler() {
                         <HomeScreen/>}>
                 </Route>
                 <Route
-                    path="/session"
+                    path={"/sessions"}
+                    element={isLoggedIn ? <SessionsList/> :
+                        <LoginScreen onLogin={handleLogin} loginError={user.loginError}/>}/>
+                <Route
+                    path="/sessions/:sessionID"
                     element={isLoggedIn ? <SessionScreen/> :
                         <LoginScreen onLogin={handleLogin} loginError={user.loginError}/>}/>
                 <Route path="/" element={isLoggedIn ? <HomeScreen/> :
