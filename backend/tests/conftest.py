@@ -1,13 +1,16 @@
 """Configuration for testing."""
 import os
-import pytest
+from collections import namedtuple
 from datetime import datetime
+
+import pytest
 from sqlalchemy.orm import sessionmaker
-from models import User, Therapist, Chat, TherapySession
 
 from config import TestConfig
 from database import Base
 from database.db_engine import DBSessionManager
+from logic.therapy_session_logic import TherapySessionLogic
+from models import User, Therapist, Chat, TherapySession
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -113,6 +116,12 @@ def therapy_session_instance(shared_session, user_instance, therapist_instance):
 
 
 @pytest.fixture
+def therapy_session_logic_instance(shared_session, therapy_session_instance):
+    """Create a therapy session logic instance."""
+    return TherapySessionLogic(pre_existing_session_id=therapy_session_instance.id)
+
+
+@pytest.fixture
 def chat_instance(shared_session, user_instance, therapist_instance, therapy_session_instance):
     """Create a chat instance."""
     chat = Chat(
@@ -126,3 +135,29 @@ def chat_instance(shared_session, user_instance, therapist_instance, therapy_ses
     shared_session.commit()
     return chat
 
+
+@pytest.fixture
+def mocked_embedding_client(mocker):
+    """Mock the embedding client."""
+    EmbeddingResponse = namedtuple('EmbeddingResponse', ['data'])
+    EmbeddingData = namedtuple('EmbeddingData', ['embedding'])
+
+    # Create an instance of the EmbeddingData named tuple
+    embedding_data = EmbeddingData(embedding=[0.1, 0.2, 0.3])
+
+    # Wrap it in the EmbeddingResponse named tuple
+    mock_response = EmbeddingResponse(data=[embedding_data])
+
+    mocked_client = mocker.patch('llm.common.client')
+    mocked_client.embeddings.create.return_value = mock_response
+    return mocked_client
+
+
+@pytest.fixture
+def mocked_chat_completion(mocker):
+    """Mock the chat completion function."""
+    # Mock the get_chat_completion function
+    return mocker.patch(
+        "logic.therapy_session_logic.get_chat_completion",
+        return_value="Welcome to your therapy session!"
+    )

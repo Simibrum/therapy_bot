@@ -1,11 +1,12 @@
 """Tests on the therapy session logic module using live requests to the OpenAI API."""
-import pytest
 from unittest.mock import patch
-import numpy as np
 
-from tests import custom_create
+import numpy as np
+import pytest
+
 from logic.therapy_session_logic import TherapySessionLogic
 from models.chats import Chat
+from tests import custom_chat_completion as custom_create
 
 
 @pytest.fixture
@@ -18,8 +19,9 @@ def test_generate_response(therapy_session_logic_instance, db_session_manager):
     """Test generating a response."""
     # Use the custom create function to use the gpt3.5 model
     with patch('llm.common.chat_completion_wrapper', custom_create):
-        chat_out = therapy_session_logic_instance.generate_response("Hello, therapist!")
-        assert chat_out
+        chat_list_out = therapy_session_logic_instance.generate_response("Hello, therapist!")
+        assert chat_list_out
+        chat_out = chat_list_out.messages[0]
         assert len(chat_out.text) > 5
         assert isinstance(chat_out.text, str)
         with db_session_manager.get_session() as session:

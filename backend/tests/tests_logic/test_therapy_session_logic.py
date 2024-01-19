@@ -1,9 +1,11 @@
 """Test the therapy session class."""
 
+import math
+
+import numpy as np
 import pytest
 from pytest_mock import MockerFixture
-import numpy as np
-import math
+
 from logic.therapy_session_logic import TherapySessionLogic
 from models.chats import Chat
 
@@ -53,7 +55,8 @@ def test_add_chat_message(db_session_manager, therapy_session_instance):
 
 def test_generate_response(mocker, therapy_session_instance, db_session_manager):
     mocker.patch("logic.therapy_session_logic.get_chat_completion", return_value="Hello, user!")
-    chat_out = therapy_session_instance.generate_response("Hello, therapist!")
+    chat_list_out = therapy_session_instance.generate_response("Hello, therapist!")
+    chat_out = chat_list_out.messages[0]
     with db_session_manager.get_session() as session:
         chat = session.query(Chat).filter(Chat.id == chat_out.id).first()
         assert chat is not None

@@ -1,4 +1,6 @@
 """Therapy session class to model a therapy session."""
+from typing import Optional
+
 import numpy as np
 
 import llm.prompt_builder as prompt_builder
@@ -9,47 +11,62 @@ from llm.chat_completion import get_chat_completion
 from models import User, Therapist, Chat, TherapySession
 
 
+# Define exceptions
+class TherapySessionDoesNotExistError(Exception):
+    """Exception raised when a therapy session does not exist."""
+    pass
+
+
+class UserIdMismatchError(Exception):
+    """Exception raised when a user id does not match."""
+    pass
+
+
+class TherapistIdMismatchError(Exception):
+    """Exception raised when a therapist id does not match."""
+    pass
+
+
+class TherapistDoesNotExistError(Exception):
+    """Exception raised when a therapy session does not exist."""
+    pass
+
+
 class TherapySessionLogic:
     def __init__(
             self,
             user_id: int = None,
             therapist_id: int = None,
-            pre_existing_session_id: int = None
+            pre_existing_session_id: int = None,
+            db_session_manager: DBSessionManager = None
     ):
         """Initialise the therapy session."""
-        # Initialise the database session manager
-        self.db_session_manager = DBSessionManager()
-        # Initialise the chat vectors
-        self.chat_vectors = None  # Numpy matrix to store chat vectors
-        self.index_to_id = {}  # Dictionary to map chat matrix index to chat id
-        # Load or create new therapy session
+        self.db_session_manager = db_session_manager or DBSessionManager()
+        self.chat_vectors = None
+        self.index_to_id = {}
         if pre_existing_session_id:
-            self.therapy_session_id = pre_existing_session_id
-            logger.info("Using pre-existing therapy session")
-            # Check the therapy session exists in the DB
-            therapy_session = self.get_therapy_session()
+            logger.debug("Using pre-existing therapy session")
+            therapy_session = self.get_therapy_session(pre_existing_session_id)
             if not therapy_session:
-                raise ValueError("Therapy session does not exist")
-            self.therapy_session_id = pre_existing_session_id
+                raise TherapySessionDoesNotExistError("Therapy session does not exist")
             if user_id and therapy_session.user_id != user_id:
-                raise ValueError("User id does not match")
+                raise UserIdMismatchError("User id does not match")
             if therapist_id and therapy_session.therapist_id != therapist_id:
-                raise ValueError("Therapist id does not match")
+                raise TherapistIdMismatchError("Therapist id does not match")
             self.user_id = therapy_session.user_id
             self.therapist_id = therapy_session.therapist_id
+            self.therapy_session_id = pre_existing_session_id
         elif user_id:
             self.user_id = user_id
             if therapist_id:
                 self.therapist_id = therapist_id
             else:
-                logger.info("Creating new therapy session with default user therapist")
+                logger.debug("Creating new therapy session with default user therapist")
                 self.therapist_id = self.get_therapist_id()
-            logger.info("Creating new therapy session")
+            logger.debug("Creating new therapy session")
             self.therapy_session_id = self.create_therapy_session()
         else:
             raise ValueError("Must provide either a user id or a pre-existing session id")
-
-        # Initialise fields to store
         self.system_prompt = self.build_system_prompt()
 
     @property
@@ -63,12 +80,16 @@ class TherapySessionLogic:
             )
             return first_chat is None
 
-    def get_therapy_session(self) -> TherapySession:
+    def get_therapy_session(self, therapy_session_id: int = None) -> TherapySession:
         """Check if the therapy session exists in the database."""
+        if not therapy_session_id:
+            if not self.therapy_session_id:
+                raise ValueError("Must provide a therapy session id")
+            therapy_session_id = self.therapy_session_id
         with self.db_session_manager.get_session() as session:
             therapy_session = (
                 session.query(TherapySession)
-                .filter(TherapySession.id == self.therapy_session_id)
+                .filter(TherapySession.id == therapy_session_id)
                 .first()
             )
             return therapy_session
@@ -82,7 +103,7 @@ class TherapySessionLogic:
             session.refresh(new_therapy_session)
             return new_therapy_session.id
 
-    def get_therapist_id(self):
+    def get_therapist_id(self) -> Optional[int]:
         """Get the therapist id."""
         with self.db_session_manager.get_session() as session:
             therapist = (
@@ -90,6 +111,8 @@ class TherapySessionLogic:
                 .filter(Therapist.user_id == self.user_id)
                 .first()
             )
+            if not therapist:
+                raise TherapistDoesNotExistError("Therapist does not exist")
             return therapist.id
 
     def load_all_session_previous_chats(self):

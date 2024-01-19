@@ -1,5 +1,6 @@
 """Tests for the users models."""
 from sqlalchemy.orm import sessionmaker
+
 from models import User, RoleEnum
 
 
@@ -18,5 +19,15 @@ def test_user(db_setup, user_instance):
     assert retrieved_user.role == RoleEnum.USER
     assert not retrieved_user.is_admin
     assert retrieved_user.encryption_key
+    assert retrieved_user.is_active
+    assert retrieved_user.is_authenticated
+    assert not retrieved_user.is_anonymous
+    assert retrieved_user.id == user_instance.id
+    assert retrieved_user.as_dict() == {
+        'id': 1,
+        'username': 'testuser',
+        'email': 'test@example.com',
+        'role': 'user',
+    }
 
     session.close()

@@ -3,7 +3,7 @@
 import pytest
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def test_client():
     """Get the test client."""
     from app.main import app

@@ -1,7 +1,6 @@
 """Tests for the chat completion."""
 import pytest
-from unittest.mock import Mock
-from config import openai_api_key
+
 from llm.chat_completion import get_chat_completion
 
 
@@ -9,7 +8,7 @@ from llm.chat_completion import get_chat_completion
 def mock_api_request(mocker):
     """Fixture to mock the api_request function."""
     mock = mocker.patch('llm.chat_completion.api_request', autospec=True)
-    mock.return_value = {"choices": [{"message": {"content": "Hello, how can I help you?"}}]}
+    mock.return_value = "Hello, how can I help you?"
     return mock
 
 
@@ -30,8 +29,7 @@ def test_get_chat_completion_basic(mock_api_request):
             {"role": "user", "content": "Tell me a joke."}
         ],
         model="gpt-3.5-turbo",
-        temperature=0.3,
-        api_key=openai_api_key  # Replace with the actual variable or value for your API key
+        temperature=0.3
     )
 
 
@@ -57,6 +55,5 @@ def test_get_chat_completion_with_history_and_briefing(mock_api_request):
             {"role": "user", "content": "Tell me a joke."}
         ],
         model="gpt-3.5-turbo",
-        temperature=0.3,
-        api_key=openai_api_key  # Replace with the actual variable or value for your API key
+        temperature=0.3
     )

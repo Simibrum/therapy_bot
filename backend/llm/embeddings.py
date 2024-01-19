@@ -26,7 +26,17 @@ def get_embedding(
     return np.array(vector_result)
 
 
-def compute_cosine_similarities(query_embedding: np.array, embeddings_matrix: np.array):
+def compute_cosine_similarities(query_embedding: np.array, embeddings_matrix: np.array) -> np.array:
     """Compute the cosine similarities between a query embedding and a matrix of embeddings."""
+    if not isinstance(query_embedding, np.ndarray) or not isinstance(embeddings_matrix, np.ndarray):
+        raise TypeError("Input arrays must be numpy arrays.")
+    if query_embedding.size == 0 or embeddings_matrix.size == 0:
+        raise ValueError("Input arrays cannot be empty.")
+    if query_embedding.shape[0] != embeddings_matrix.shape[1]:
+        raise ValueError("Input arrays have incompatible shapes.")
+    if np.isnan(query_embedding).any() or np.isnan(embeddings_matrix).any() or np.isinf(
+            query_embedding).any() or np.isinf(embeddings_matrix).any():
+        raise ValueError("Input arrays contain NaN or infinite values")
+    
     result = np.dot(query_embedding.T, embeddings_matrix.T)
     return result

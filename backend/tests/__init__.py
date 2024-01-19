@@ -1,14 +1,13 @@
+from llm.common import client
 
-import openai
 
-
-def custom_create(model, messages, api_key: str, temperature: float = 0.7, max_tokens: int = 10,  ):
+def custom_chat_completion(model, messages, temperature: float = 0.7, max_tokens: int = 10):
     """Custom create function to tailor model for cheaper/quicker testing."""
     # Change model to cheaper and quicker model
-    return openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model='gpt-3.5-turbo',
         messages=messages,
         max_tokens=max_tokens,
         temperature=temperature,
-        api_key=api_key
     )
+    return response.choices[0].message.content

@@ -1,13 +1,13 @@
 """Define a users table."""
-import bcrypt
+from datetime import datetime, timedelta
+from enum import Enum as PyEnum
 from typing import Optional
-from sqlalchemy import Enum, String, DateTime
+
+import bcrypt
+from sqlalchemy import Enum, String, DateTime, Boolean
 from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy.orm import relationship
-from enum import Enum as PyEnum
-from datetime import datetime, timedelta
 
-from config import logger
 from database import Base
 from utils.text_crypto import generate_encryption_key
 
@@ -26,7 +26,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(255), nullable=False)
     email: Mapped[str] = mapped_column(String(255), nullable=False)
-    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=True)
     # Set a role for the user
     role: Mapped[RoleEnum] = mapped_column(Enum(RoleEnum), nullable=False, default=RoleEnum.USER)
 
@@ -37,6 +37,10 @@ class User(Base):
     city: Mapped[str] = mapped_column(String(255), nullable=True)
     country: Mapped[str] = mapped_column(String(255), nullable=True)
     date_of_birth: Mapped[DateTime] = mapped_column(DateTime, nullable=True)
+
+    # User state
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    is_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     # Encryption key for encrypting the chat and therapist data
     encryption_key: Mapped[str] = mapped_column(String(255), nullable=True)
@@ -83,10 +87,6 @@ class User(Base):
     # Properties for Flask-Login that need to be implemented
     @property
     def is_authenticated(self):
-        return True
-
-    @property
-    def is_active(self):
         return True
 
     @property

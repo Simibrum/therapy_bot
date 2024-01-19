@@ -1,14 +1,20 @@
 """CRUD methods for users."""
 from typing import Optional, List
+
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
-from models import User, RoleEnum
+
 from app.schemas.pydantic_users import UserUpdate, UserOut
+from models import User, RoleEnum
 
 
 def get_user_by_username(session: Session, username: str) -> Optional[User]:
     """Get a user by username - for auth."""
-    user = session.query(User).filter(User.username == username).first()
-    if not user:
+    if not username:
+        return None
+    try:
+        user = session.query(User).filter(User.username == username).one_or_none()
+    except NoResultFound:
         return None
     return user
 
@@ -27,16 +33,15 @@ def create_user(session: Session, user_in: UserUpdate) -> UserOut:
     session.add(user)
     session.commit()
     session.refresh(user)
-    return UserOut.from_orm(user)
+    return UserOut.model_validate(user)
 
 
-def get_user(session: Session, user_hash_id: str) -> Optional[UserOut]:
+def get_user(session: Session, user_id: str) -> Optional[UserOut]:
     """Get a user."""
-    user_id = decode_id(user_hash_id)
     user = session.query(User).filter(User.id == user_id).first()
     if not user:
         return None
-    return UserOut.from_orm(user)
+    return UserOut.model_validate(user)
 
 
 def get_users(session: Session) -> List[UserOut]:
