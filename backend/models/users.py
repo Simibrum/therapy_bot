@@ -1,14 +1,15 @@
 """Define a users table."""
-from datetime import datetime, timedelta
+from datetime import timedelta
 from enum import Enum as PyEnum
 from typing import Optional
 
 import bcrypt
-from sqlalchemy import Enum, String, DateTime, Boolean
+from sqlalchemy import Enum, String, Boolean
 from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy.orm import relationship
 
 from database import Base
+from models.common import LocationMixin, PersonNameMixin, LifeDatesMixin
 from utils.text_crypto import generate_encryption_key
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -21,7 +22,7 @@ class RoleEnum(PyEnum):
     USER = "user"
 
 
-class User(Base):
+class User(Base, LocationMixin, PersonNameMixin, LifeDatesMixin):
     """Define a users table."""
 
     __tablename__ = "users"
@@ -34,13 +35,7 @@ class User(Base):
         Enum(RoleEnum), nullable=False, default=RoleEnum.USER
     )
 
-    # User details
-    first_name: Mapped[str] = mapped_column(String(255), nullable=True)
-    last_name: Mapped[str] = mapped_column(String(255), nullable=True)
-    address: Mapped[str] = mapped_column(String(255), nullable=True)
-    city: Mapped[str] = mapped_column(String(255), nullable=True)
-    country: Mapped[str] = mapped_column(String(255), nullable=True)
-    date_of_birth: Mapped[DateTime] = mapped_column(DateTime, nullable=True)
+    # User details - via the mixins
 
     # User state
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
@@ -113,24 +108,3 @@ class User(Base):
             "email": self.email,
             "role": self.role.value,
         }
-
-    @property
-    def age(self) -> int:
-        """
-        Returns the age of the user based on the date of birth.
-
-        Returns:
-            int: The age of the user in years.
-        """
-        if self.date_of_birth:
-            today = datetime.today()
-            age = (
-                today.year
-                - self.date_of_birth.year
-                - (
-                    (today.month, today.day)
-                    < (self.date_of_birth.month, self.date_of_birth.day)
-                )
-            )
-            return age
-        return -1

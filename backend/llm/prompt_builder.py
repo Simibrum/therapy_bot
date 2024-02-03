@@ -1,7 +1,9 @@
 """Functions to build prompts for the LLM model."""
 from typing import List
 
-from app.schemas import UserOut, TherapistOut, ChatListOut
+from app.schemas.pydantic_chats import ChatListOut
+from app.schemas.pydantic_therapists import TherapistOut
+from app.schemas.pydantic_users import UserOut
 
 
 def build_system_prompt(user: UserOut, therapist: TherapistOut) -> str:

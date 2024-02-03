@@ -3,6 +3,7 @@ import datetime
 
 import numpy as np
 from sqlalchemy import ForeignKey, Integer, String, DateTime, func
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 
@@ -11,6 +12,44 @@ from database import Base
 from llm.embeddings import get_embedding
 from models.bytes_vector_mixin import BytesVectorMixin
 from utils.text_crypto import encrypt_string, decrypt_string
+
+
+class ChatReferenceAssociation(Base):
+    """Associates a chat reference with a particular entity.
+
+    Based on here
+    - https://docs.sqlalchemy.org/en/20/_modules/examples/generic_associations/discriminator_on_association.html
+    """
+
+    __tablename__ = "chat_reference_association"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+
+    discriminator: Mapped[str] = mapped_column(String(255))
+
+    __mapper_args__ = {"polymorphic_on": discriminator}
+
+
+class ChatReference(Base):
+    """Reference to a particular location within a chat."""
+
+    __tablename__ = "chat_references"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    chat_id: Mapped[int] = mapped_column(ForeignKey("chats.id"), nullable=False)
+
+    character_idx_start: Mapped[int] = mapped_column(Integer, nullable=False)
+    character_idx_end: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    span_idx_start: Mapped[int] = mapped_column(Integer, nullable=False)
+    span_idx_end: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    sentence_idx: Mapped[int] = mapped_column(Integer, nullable=False)
+    doc_index: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+    association_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("chat_reference_association.id")
+    )
+    association = relationship("ChatReferenceAssociation", backref="chat_references")
+    parent = association_proxy("association", "parent")
 
 
 class Chat(Base, BytesVectorMixin):
