@@ -33,3 +33,6 @@ langchain
 openai>=1.2.0
 tiktoken
 numpy
+
+# Graph stuff
+graphviz

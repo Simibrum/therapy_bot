@@ -2,16 +2,18 @@
 import datetime
 
 import numpy as np
-from sqlalchemy import ForeignKey, Integer, String, DateTime, func, LargeBinary
+from sqlalchemy import ForeignKey, Integer, String, DateTime, func
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, mapped_column, Mapped
-from database import Base
-from utils.text_crypto import encrypt_string, decrypt_string
+
 from config import logger
+from database import Base
 from llm.embeddings import get_embedding
+from models.bytes_vector_mixin import BytesVectorMixin
+from utils.text_crypto import encrypt_string, decrypt_string
 
 
-class Chat(Base):
+class Chat(Base, BytesVectorMixin):
     __tablename__ = 'chats'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
@@ -22,8 +24,7 @@ class Chat(Base):
     sender: Mapped[str] = mapped_column(String(10), nullable=False)
     # This is the text of the chat, to be encrypted with the user's encryption key as below
     _encrypted_text: Mapped[str] = mapped_column(String, nullable=True)
-    # Vector of the text - store this as bytes - implement a loader separately
-    _vector: Mapped[bytes] = mapped_column(LargeBinary, nullable=True)
+    # Vector field provided by BytesVectorMixin as _vector
 
     # Relationships
     user = relationship("User", back_populates="chats")
@@ -52,23 +53,6 @@ class Chat(Base):
             plaintext (str): The string to be encrypted.
         """
         self._encrypted_text = encrypt_string(self.user.encryption_key.encode(), plaintext)
-
-    @hybrid_property
-    def vector(self) -> np.array:
-        """Convert the bytes vector into a numpy array."""
-        if self._vector is None:
-            return None
-        # Convert to numpy array
-        return np.frombuffer(self._vector)
-
-    @vector.setter
-    def vector(self, vector: np.array) -> None:
-        """Convert the numpy array into a bytes vector."""
-        if vector is None:
-            self._vector = b""
-        else:
-            # Convert to bytes
-            self._vector = vector.tobytes()
 
     def fetch_text_vector(self) -> np.array:
         """Fetch the embedding for the text."""

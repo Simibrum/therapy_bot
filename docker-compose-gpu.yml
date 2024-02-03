@@ -1,0 +1,32 @@
+# Therapy Bot Docker Compose File
+version: "3.8"
+
+services:
+  backend:
+    image: therapy_bot_backend_gpu:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile_gpu
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      DEBUG_MODE: "False"
+      CONFIG_ENV: "production"
+      FRONTEND_URL: ${FRONTEND_URL}
+    ports:
+      - "8000:80"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [ gpu ]
+    # Need to define volumes for cached embeddings and parser
+
+  frontend:
+    image: therapy_bot_frontend:latest
+    build:
+      context: ./frontend
+      args:
+        - REACT_APP_BACKEND_URL=${BACKEND_URL}
+    ports:
+      - "3000:80"
+
