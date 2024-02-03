@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 class NodeOut(BaseModel):
     """Node in a graph."""
+
     id: int
     label: str
     user_id: int

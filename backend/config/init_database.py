@@ -17,11 +17,7 @@ def create_default_user():
     username = os.getenv("DEFAULT_USER", "i-am-admin")
     email = os.getenv("DEFAULT_EMAIL", "me@great.com")
     password = os.getenv("DEFAULT_PASSWORD", "a-really-bad-password")
-    user = User(
-        username=username,
-        email=email,
-        password_hash="1234567"
-    )
+    user = User(username=username, email=email, password_hash="1234567")
     user.set_password(password)
     first_name = "Brian"
     user.first_name = first_name
@@ -48,7 +44,7 @@ def create_default_therapist():
         last_name="Hall",
         user_id=user.id,
         residence="Bristol",
-        description=description
+        description=description,
     )
     session.add(therapist)
     session.commit()
@@ -69,6 +65,6 @@ def create_tables():
     create_default_therapist()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Create the tables
     create_tables()

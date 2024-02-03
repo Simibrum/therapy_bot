@@ -9,6 +9,7 @@ from config import logger
 
 class BytesVectorMixin:
     """Abstract class to store a vector as bytes."""
+
     __abstract__ = True
 
     # This is the vector of the text - store this as bytes - implement a loader separately
@@ -43,7 +44,9 @@ class BytesVectorMixin:
                 raise ValueError(f"Vector must be 1D, not {len(vector.shape)}D.")
             # Validate the vector - elements should be floats or ints
             if not np.issubdtype(vector.dtype, np.number):
-                raise ValueError(f"Vector elements must be numbers, not {vector.dtype}.")
+                raise ValueError(
+                    f"Vector elements must be numbers, not {vector.dtype}."
+                )
             # If entries are ints convert to floats
             if np.issubdtype(vector.dtype, np.integer):
                 vector = vector.astype(float)

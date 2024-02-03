@@ -1,13 +1,13 @@
 """Route for login."""
 from datetime import timedelta
+
 from fastapi import APIRouter, Depends
-from fastapi.security import OAuth2PasswordBearer
 from fastapi_login.exceptions import InvalidCredentialsException
 from sqlalchemy.orm import Session
-from app.schemas.pydantic_users import UserLogin, UserLoginOut
-from app.dependencies import manager, query_user
-from database.db_engine import get_db
 
+from app.dependencies import manager, query_user
+from app.schemas.pydantic_users import UserLogin, UserLoginOut
+from database.db_engine import get_db
 
 router = APIRouter()
 
@@ -16,10 +16,10 @@ router = APIRouter()
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-@router.post('/login')
+@router.post("/login")
 def login(
-        user_login: UserLogin,
-        session: Session = Depends(get_db),
+    user_login: UserLogin,
+    session: Session = Depends(get_db),
 ):
     """Authenticate a user and return a cookie."""
     username = user_login.username
@@ -32,14 +32,13 @@ def login(
     elif not (user.is_active and user.check_password(password)):
         raise InvalidCredentialsException
     access_token = manager.create_access_token(
-        data={'sub': username},
-        expires=timedelta(hours=1)
+        data={"sub": username}, expires=timedelta(hours=1)
     )
     return UserLoginOut(
         access_token=access_token,
-        token_type='bearer',
+        token_type="bearer",
         id=user.id,
         username=user.username,
         first_name=user.first_name,
         is_active=user.is_active,
-    )
+    )  # nosec: B106

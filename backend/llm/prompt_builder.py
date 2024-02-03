@@ -35,16 +35,19 @@ def build_system_prompt(user: UserOut, therapist: TherapistOut) -> str:
 
 def build_past_chat_summary_prompt(past_chats: List[str]) -> str:
     """Build the past chat summary prompt."""
-    return "System: Here is a summary of our past chats:\n\n" + "\n\n".join(
-        past_chats
-    ) + "\n\nUser: "
+    return (
+        "System: Here is a summary of our past chats:\n\n"
+        + "\n\n".join(past_chats)
+        + "\n\nUser: "
+    )
 
 
 def build_new_session_prompt() -> str:
     """Build the new session prompt."""
     return (
         "[This is your first therapy session. "
-        "Find out about the user, their family, work, life history, problems, likes and dislikes.]")
+        "Find out about the user, their family, work, life history, problems, likes and dislikes.]"
+    )
 
 
 def build_first_message_prompt() -> str:
@@ -63,7 +66,7 @@ def build_next_message_prompt(user_input: str) -> str:
     next_message_string = (
         f"[The user last said: {user_input}\n\n"
         f"Provide a next message to the user to continue the therapy session."
-        f"(OMIT \"Therapist: \" from the start of your message.) "
+        f'(OMIT "Therapist: " from the start of your message.) '
         f"]"
     )
     return next_message_string

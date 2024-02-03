@@ -1,13 +1,13 @@
 """Dependencies for FastAPI app."""
 from fastapi_login import LoginManager
 from sqlalchemy.orm import Session
+
+from app.crud.users import get_user_by_username
+from config import SECRET_KEY
 from database.db_engine import DBSessionManager
 
-from config import SECRET_KEY
-from app.crud.users import get_user_by_username
-
 # Configure FASTAPI Login
-manager = LoginManager(SECRET_KEY.encode("utf-8"), '/token', use_cookie=False)
+manager = LoginManager(SECRET_KEY.encode("utf-8"), "/token", use_cookie=False)
 
 
 @manager.user_loader(db_session=None)

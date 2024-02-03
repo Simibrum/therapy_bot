@@ -2,7 +2,6 @@
 
 
 class TestReadRoot:
-
     #  Returns a JSON object with a "message" key and value "Hello, World!"
     def test_returns_json_with_message_key_and_value(self, test_client):
         response = test_client.get("/")
@@ -13,7 +12,7 @@ class TestReadRoot:
     def test_none(self, test_client):
         response = test_client.get("/")
         assert response.status_code == 200
-        assert response.json() == {'message': 'Hello, World!'}
+        assert response.json() == {"message": "Hello, World!"}
 
     #  The function should handle concurrent requests without errors
     def test_concurrent_requests(self, test_client):

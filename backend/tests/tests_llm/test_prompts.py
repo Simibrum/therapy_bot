@@ -1,5 +1,4 @@
 """Testing out the prompts."""
-import pytest
 
 from app.schemas import UserOut, TherapistOut
 from llm.prompt_builder import (

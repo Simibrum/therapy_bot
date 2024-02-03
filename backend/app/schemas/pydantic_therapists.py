@@ -1,11 +1,13 @@
 """Pydantic schema for the therapists model."""
 
 from typing import Optional
+
 from pydantic import BaseModel, ConfigDict
 
 
 class TherapistOut(BaseModel):
     """Pydantic schema for the therapist model."""
+
     model_config = ConfigDict(from_attributes=True)
 
     id: int

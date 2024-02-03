@@ -22,12 +22,13 @@ def get_user_by_username(session: Session, username: str) -> Optional[User]:
 def create_user(session: Session, user_in: UserUpdate) -> UserOut:
     """Create a new user."""
     # Convert role to an enum
-    role = RoleEnum(user_in.role) if user_in.role in RoleEnum.__members__ else RoleEnum.USER
+    role = (
+        RoleEnum(user_in.role)
+        if user_in.role in RoleEnum.__members__
+        else RoleEnum.USER
+    )
     user = User(
-        username=user_in.username,
-        email=user_in.email,
-        password_hash="temp",
-        role=role
+        username=user_in.username, email=user_in.email, password_hash="temp", role=role
     )
     user.set_password(user_in.password)
     session.add(user)
@@ -50,9 +51,8 @@ def get_users(session: Session) -> List[UserOut]:
     return [UserOut(**user.as_dict()) for user in users]
 
 
-def update_user(session: Session, user_hash_id, user_in: UserUpdate) -> Optional[UserOut]:
+def update_user(session: Session, user_id, user_in: UserUpdate) -> Optional[UserOut]:
     """Update a user."""
-    user_id = decode_id(user_hash_id)
     user = session.query(User).filter(User.id == user_id).first()
     if not user:
         return None

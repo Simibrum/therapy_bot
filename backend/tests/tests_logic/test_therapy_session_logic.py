@@ -54,7 +54,9 @@ def test_add_chat_message(db_session_manager, therapy_session_instance):
 
 
 def test_generate_response(mocker, therapy_session_instance, db_session_manager):
-    mocker.patch("logic.therapy_session_logic.get_chat_completion", return_value="Hello, user!")
+    mocker.patch(
+        "logic.therapy_session_logic.get_chat_completion", return_value="Hello, user!"
+    )
     chat_list_out = therapy_session_instance.generate_response("Hello, therapist!")
     chat_out = chat_list_out.messages[0]
     with db_session_manager.get_session() as session:
@@ -80,15 +82,21 @@ def test_load_previous_chats(therapy_session_instance_with_chat):
 def test_cosine_similarity_search(therapy_session_instance_with_chat):
     therapy_session_instance_with_chat.load_all_session_previous_chats()
     query_vector = therapy_session_instance_with_chat.chat_vectors[0]
-    similarity_scores = therapy_session_instance_with_chat.cosine_similarity_search(query_vector)
+    similarity_scores = therapy_session_instance_with_chat.cosine_similarity_search(
+        query_vector
+    )
     assert len(similarity_scores) == 1
-    assert math.isclose(similarity_scores[0], 1.0, rel_tol=1e-4)  # Assuming the vector is compared with itself
+    assert math.isclose(
+        similarity_scores[0], 1.0, rel_tol=1e-4
+    )  # Assuming the vector is compared with itself
 
 
 def test_get_relevant_past_chats(therapy_session_instance_with_chat):
     therapy_session_instance_with_chat.load_all_session_previous_chats()
     query_vector = therapy_session_instance_with_chat.chat_vectors[0]
-    relevant_chat_ids = therapy_session_instance_with_chat.get_relevant_past_chat_ids(query_vector)
+    relevant_chat_ids = therapy_session_instance_with_chat.get_relevant_past_chat_ids(
+        query_vector
+    )
     assert len(relevant_chat_ids) == 1
     assert relevant_chat_ids[0][0] == 1
     assert math.isclose(relevant_chat_ids[0][1], 1.0, rel_tol=1e-4)

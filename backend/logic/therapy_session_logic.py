@@ -14,31 +14,35 @@ from models import User, Therapist, Chat, TherapySession
 # Define exceptions
 class TherapySessionDoesNotExistError(Exception):
     """Exception raised when a therapy session does not exist."""
+
     pass
 
 
 class UserIdMismatchError(Exception):
     """Exception raised when a user id does not match."""
+
     pass
 
 
 class TherapistIdMismatchError(Exception):
     """Exception raised when a therapist id does not match."""
+
     pass
 
 
 class TherapistDoesNotExistError(Exception):
     """Exception raised when a therapy session does not exist."""
+
     pass
 
 
 class TherapySessionLogic:
     def __init__(
-            self,
-            user_id: int = None,
-            therapist_id: int = None,
-            pre_existing_session_id: int = None,
-            db_session_manager: DBSessionManager = None
+        self,
+        user_id: int = None,
+        therapist_id: int = None,
+        pre_existing_session_id: int = None,
+        db_session_manager: DBSessionManager = None,
     ):
         """Initialise the therapy session."""
         self.db_session_manager = db_session_manager or DBSessionManager()
@@ -66,7 +70,9 @@ class TherapySessionLogic:
             logger.debug("Creating new therapy session")
             self.therapy_session_id = self.create_therapy_session()
         else:
-            raise ValueError("Must provide either a user id or a pre-existing session id")
+            raise ValueError(
+                "Must provide either a user id or a pre-existing session id"
+            )
         self.system_prompt = self.build_system_prompt()
 
     @property
@@ -97,7 +103,9 @@ class TherapySessionLogic:
     def create_therapy_session(self):
         """Create a new therapy session."""
         with self.db_session_manager.get_session() as session:
-            new_therapy_session = TherapySession(user_id=self.user_id, therapist_id=self.therapist_id)
+            new_therapy_session = TherapySession(
+                user_id=self.user_id, therapist_id=self.therapist_id
+            )
             session.add(new_therapy_session)
             session.commit()
             session.refresh(new_therapy_session)
@@ -157,9 +165,11 @@ class TherapySessionLogic:
             if new_chat.id not in self.index_to_id.values():
                 self.index_to_id[len(self.index_to_id)] = new_chat.id
                 # Add to chat vector stack
-                self.chat_vectors = np.vstack(
-                    (self.chat_vectors, new_chat.vector)
-                ) if self.chat_vectors is not None else new_chat.vector
+                self.chat_vectors = (
+                    np.vstack((self.chat_vectors, new_chat.vector))
+                    if self.chat_vectors is not None
+                    else new_chat.vector
+                )
             return chat_out
 
     def cosine_similarity_search(self, query_vector):
@@ -168,9 +178,9 @@ class TherapySessionLogic:
             self.load_all_session_previous_chats()
         if self.chat_vectors is None:
             return []
-        similarity_scores = (
-            self.chat_vectors @ query_vector
-        ) / (np.linalg.norm(self.chat_vectors, axis=1) * np.linalg.norm(query_vector))
+        similarity_scores = (self.chat_vectors @ query_vector) / (
+            np.linalg.norm(self.chat_vectors, axis=1) * np.linalg.norm(query_vector)
+        )
         return similarity_scores
 
     def get_relevant_past_chat_ids(self, user_input_vector, threshold: int = 0.75):
@@ -186,7 +196,11 @@ class TherapySessionLogic:
         """Build the system prompt."""
         with self.db_session_manager.get_session() as session:
             user = session.query(User).filter(User.id == self.user_id).first()
-            therapist = session.query(Therapist).filter(Therapist.id == self.therapist_id).first()
+            therapist = (
+                session.query(Therapist)
+                .filter(Therapist.id == self.therapist_id)
+                .first()
+            )
             user_out = UserOut.model_validate(user)
             therapist_out = TherapistOut.model_validate(therapist)
         return prompt_builder.build_system_prompt(user_out, therapist_out)
@@ -210,19 +224,25 @@ class TherapySessionLogic:
         ]
         first_message = prompt_builder.build_first_message_prompt()
         # Get the first message from the therapist
-        response = get_chat_completion(first_message, self.system_prompt, briefing_messages=briefing_messages)
+        response = get_chat_completion(
+            first_message, self.system_prompt, briefing_messages=briefing_messages
+        )
         self.add_chat_message("therapist", response)
         return self.get_therapy_session_messages()
 
     def generate_response(self, user_input) -> ChatListOut:
         """Generate a response using the ChatCompletion API."""
         # Get the history
-        history = prompt_builder.build_recent_session_history(self.get_therapy_session_messages())
+        history = prompt_builder.build_recent_session_history(
+            self.get_therapy_session_messages()
+        )
         # Add the user input to the chat history
         self.add_chat_message("user", user_input)
         next_message_prompt = prompt_builder.build_next_message_prompt(user_input)
         # This needs to use the history to prevent "Hello [User]" being repeated
-        response = get_chat_completion(next_message_prompt, self.system_prompt, history=history)
+        response = get_chat_completion(
+            next_message_prompt, self.system_prompt, history=history
+        )
         chat_out = self.add_chat_message("therapist", response)
         return ChatListOut(messages=[chat_out])
 
@@ -232,4 +252,3 @@ class TherapySessionLogic:
             return self.start_session()
         else:
             return self.get_therapy_session_messages()
-

@@ -8,7 +8,6 @@ from models.graph.edge import Edge
 
 
 class TestEdge:
-
     #  Edge object can be created with valid parameters
     def test_edge_creation_with_valid_parameters(self, multiple_nodes, user_instance):
         edge = Edge(
@@ -17,7 +16,7 @@ class TestEdge:
             from_node_id=multiple_nodes[0].id,
             to_node_id=multiple_nodes[1].id,
             type="type",
-            description="description"
+            description="description",
         )
         assert edge.id == 1
         assert edge.user_id == 1
@@ -28,7 +27,14 @@ class TestEdge:
 
     #  Edge object can have its attributes updated
     def test_edge_attribute_update(self):
-        edge = Edge(id=1, user_id=1, from_node_id=1, to_node_id=2, type="type", description="description")
+        edge = Edge(
+            id=1,
+            user_id=1,
+            from_node_id=1,
+            to_node_id=2,
+            type="type",
+            description="description",
+        )
         edge.id = 2
         edge.user_id = 2
         edge.from_node_id = 2
@@ -44,20 +50,41 @@ class TestEdge:
 
     #  Edge object can have its vector attribute set and retrieved
     def test_edge_vector_set_and_retrieve(self):
-        edge = Edge(id=1, user_id=1, from_node_id=1, to_node_id=2, type="type", description="description")
+        edge = Edge(
+            id=1,
+            user_id=1,
+            from_node_id=1,
+            to_node_id=2,
+            type="type",
+            description="description",
+        )
         vector = np.array([1, 2, 3])
         edge.vector = vector
         assert np.array_equal(edge.vector, vector)
 
     #  Edge object can have its vector attribute set to None
     def test_edge_vector_set_to_none(self):
-        edge = Edge(id=1, user_id=1, from_node_id=1, to_node_id=2, type="type", description="description")
+        edge = Edge(
+            id=1,
+            user_id=1,
+            from_node_id=1,
+            to_node_id=2,
+            type="type",
+            description="description",
+        )
         edge.vector = None
         assert edge.vector is None
 
     #  Edge object can have its vector attribute set to an empty numpy array
     def test_edge_vector_set_to_empty_array(self):
-        edge = Edge(id=1, user_id=1, from_node_id=1, to_node_id=2, type="type", description="description")
+        edge = Edge(
+            id=1,
+            user_id=1,
+            from_node_id=1,
+            to_node_id=2,
+            type="type",
+            description="description",
+        )
         vector = np.array([])
         edge.vector = vector
         assert edge.vector is None
@@ -89,13 +116,27 @@ class TestEdge:
 
     #  Edge object cannot have its vector attribute set to a non-numpy array
     def test_edge_vector_set_to_non_numpy_array(self):
-        edge = Edge(id=1, user_id=1, from_node_id=1, to_node_id=2, type="type", description="description")
+        edge = Edge(
+            id=1,
+            user_id=1,
+            from_node_id=1,
+            to_node_id=2,
+            type="type",
+            description="description",
+        )
         with pytest.raises(TypeError):
             edge.vector = [1, 2, 3]
 
     #  Edge object cannot have its vector attribute set to a numpy array with non-numeric elements
     def test_edge_vector_set_to_numpy_array_with_non_numeric_elements(self):
-        edge = Edge(id=1, user_id=1, from_node_id=1, to_node_id=2, type="type", description="description")
+        edge = Edge(
+            id=1,
+            user_id=1,
+            from_node_id=1,
+            to_node_id=2,
+            type="type",
+            description="description",
+        )
         with pytest.raises(ValueError):
             edge.vector = np.array([1, 2, "3"])
 

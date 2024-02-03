@@ -2,10 +2,11 @@
 
 
 class TestReadUsersMe:
-
     #  Return details of the current user.
 
-    def test_return_details_of_current_user(self, authenticated_test_client, user_instance):
+    def test_return_details_of_current_user(
+        self, authenticated_test_client, user_instance
+    ):
         response = authenticated_test_client.get("/users/me")
         assert response.status_code == 200
         assert response.json() == {
@@ -18,7 +19,7 @@ class TestReadUsersMe:
             "address": user_instance.address,
             "city": user_instance.city,
             "country": user_instance.country,
-            "age": user_instance.age
+            "age": user_instance.age,
         }
 
     def test_user_is_authenticated(self, authenticated_test_client):
@@ -36,7 +37,9 @@ class TestReadUsersMe:
         assert response.status_code == 401
 
     #  User is not active.
-    def test_user_is_not_active(self, authenticated_test_client, user_instance, shared_session):
+    def test_user_is_not_active(
+        self, authenticated_test_client, user_instance, shared_session
+    ):
         user_instance.is_active = False
         shared_session.commit()
         response = authenticated_test_client.get("/users/me")

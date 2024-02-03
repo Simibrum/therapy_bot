@@ -16,19 +16,23 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 class RoleEnum(PyEnum):
     """Set up the roles."""
-    ADMIN = 'admin'
-    USER = 'user'
+
+    ADMIN = "admin"
+    USER = "user"
 
 
 class User(Base):
     """Define a users table."""
-    __tablename__ = 'users'
+
+    __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(255), nullable=False)
     email: Mapped[str] = mapped_column(String(255), nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=True)
     # Set a role for the user
-    role: Mapped[RoleEnum] = mapped_column(Enum(RoleEnum), nullable=False, default=RoleEnum.USER)
+    role: Mapped[RoleEnum] = mapped_column(
+        Enum(RoleEnum), nullable=False, default=RoleEnum.USER
+    )
 
     # User details
     first_name: Mapped[str] = mapped_column(String(255), nullable=True)
@@ -60,16 +64,21 @@ class User(Base):
 
     def check_password(self, password):
         """Check the password hash against the password."""
-        return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
+        return bcrypt.checkpw(
+            password.encode("utf-8"), self.password_hash.encode("utf-8")
+        )
 
     def set_password(self, password):
         """
         Generate a hash of the password using bcrypt and save it to the password_hash field.
         """
-        self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        self.password_hash = bcrypt.hashpw(
+            password.encode("utf-8"), bcrypt.gensalt()
+        ).decode("utf-8")
 
     def create_access_token(self, expires_delta: Optional[timedelta] = None):
         from app.dependencies import manager
+
         data = {"sub": self.username}
         if not expires_delta:
             expires_delta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -102,7 +111,7 @@ class User(Base):
             "id": self.id,
             "username": self.username,
             "email": self.email,
-            "role": self.role.value
+            "role": self.role.value,
         }
 
     @property
@@ -115,7 +124,13 @@ class User(Base):
         """
         if self.date_of_birth:
             today = datetime.today()
-            age = today.year - self.date_of_birth.year - (
-                        (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day))
+            age = (
+                today.year
+                - self.date_of_birth.year
+                - (
+                    (today.month, today.day)
+                    < (self.date_of_birth.month, self.date_of_birth.day)
+                )
+            )
             return age
         return -1

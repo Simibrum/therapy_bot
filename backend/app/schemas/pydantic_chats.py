@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict
 
 class ChatOut(BaseModel):
     """Pydantic schema for the chat model."""
+
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -24,6 +25,7 @@ class ChatOut(BaseModel):
 
 class ChatListOut(BaseModel):
     """Wrapper for list of chats."""
+
     messages: list[ChatOut]
 
     def as_string(self):

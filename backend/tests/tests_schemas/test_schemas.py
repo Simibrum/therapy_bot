@@ -1,6 +1,8 @@
 """Test schema objects."""
-import pytest
 import datetime
+
+import pytest
+
 from app.schemas.pydantic_chats import ChatOut, ChatListOut
 
 
@@ -14,7 +16,7 @@ def chat_out_instance():
         therapist_id=None,
         text="Hello!",
         sender="user",
-        timestamp=datetime.datetime(2023, 11, 3, 10, 0, 0)
+        timestamp=datetime.datetime(2023, 11, 3, 10, 0, 0),
     )
 
 
@@ -32,5 +34,7 @@ def test_chat_out_as_string(chat_out_instance):
 
 def test_chat_list_out_as_string(chat_list_out_instance):
     """Test the as_string method of ChatListOut."""
-    expected_string = "user: Hello!\n(2023-11-03 10:00:00)\n\nuser: Hello!\n(2023-11-03 10:00:00)"
+    expected_string = (
+        "user: Hello!\n(2023-11-03 10:00:00)\n\nuser: Hello!\n(2023-11-03 10:00:00)"
+    )
     assert chat_list_out_instance.as_string() == expected_string

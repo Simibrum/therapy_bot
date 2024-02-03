@@ -6,7 +6,6 @@ from models.graph.node import Node
 
 
 class TestNode:
-
     #  Node object can be initialized with a label
     def test_initialized_with_label(self, user_instance):
         node = Node("label", user_id=user_instance.id)

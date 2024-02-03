@@ -4,8 +4,8 @@ from alembic import context
 
 from database import Base
 from database.db_engine import DBSessionManager
+
 # We need the line below to ensure the tables are created properly
-from models import *
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -20,7 +20,9 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = Base.metadata  # Edited from default - This is the metadata from the models
+target_metadata = (
+    Base.metadata
+)  # Edited from default - This is the metadata from the models
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -62,9 +64,7 @@ def run_migrations_online() -> None:
     connectable = DBSessionManager.get_engine()
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

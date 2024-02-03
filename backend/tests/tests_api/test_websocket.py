@@ -1,7 +1,8 @@
 """Test the websocket API connection."""
 import pytest
-from fastapi.testclient import TestClient
 from fastapi import WebSocketDisconnect
+from fastapi.testclient import TestClient
+
 from app.main import app
 
 client = TestClient(app)
@@ -30,5 +31,3 @@ def test_websocket_no_auth_connection(therapy_session_instance):
         # Check websocket is closed
         with pytest.raises(WebSocketDisconnect):
             websocket.receive_text()
-
-

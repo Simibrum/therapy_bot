@@ -7,7 +7,7 @@ from llm.chat_completion import get_chat_completion
 @pytest.fixture
 def mock_api_request(mocker):
     """Fixture to mock the api_request function."""
-    mock = mocker.patch('llm.chat_completion.api_request', autospec=True)
+    mock = mocker.patch("llm.chat_completion.api_request", autospec=True)
     mock.return_value = "Hello, how can I help you?"
     return mock
 
@@ -26,10 +26,10 @@ def test_get_chat_completion_basic(mock_api_request):
     mock_api_request.assert_called_once_with(
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": "Tell me a joke."}
+            {"role": "user", "content": "Tell me a joke."},
         ],
         model="gpt-3.5-turbo",
-        temperature=0.3
+        temperature=0.3,
     )
 
 
@@ -40,8 +40,12 @@ def test_get_chat_completion_with_history_and_briefing(mock_api_request):
     history = "What's your name?"
     briefing_messages = ["Please be funny."]
 
-    result = get_chat_completion(next_message_prompt, system_prompt, history=history,
-                                 briefing_messages=briefing_messages)
+    result = get_chat_completion(
+        next_message_prompt,
+        system_prompt,
+        history=history,
+        briefing_messages=briefing_messages,
+    )
 
     # Check the result
     assert result == "Hello, how can I help you?"
@@ -52,8 +56,8 @@ def test_get_chat_completion_with_history_and_briefing(mock_api_request):
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": "What's your name?"},
             {"role": "user", "content": "Please be funny."},
-            {"role": "user", "content": "Tell me a joke."}
+            {"role": "user", "content": "Tell me a joke."},
         ],
         model="gpt-3.5-turbo",
-        temperature=0.3
+        temperature=0.3,
     )

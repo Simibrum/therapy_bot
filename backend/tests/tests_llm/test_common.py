@@ -25,10 +25,14 @@ def test_api_request(mock_chat_completion, monkeypatch, mocked_embedding_client)
 
     # Testing other model case
     other_model = "gpt-3.5-turbo"
-    response = api_request(messages=[{"role": "system", "content": "You are a helpful assistant."}], model=other_model)
+    response = api_request(
+        messages=[{"role": "system", "content": "You are a helpful assistant."}],
+        model=other_model,
+    )
     assert response == "Some value"
     mock_chat_completion.assert_called_once()
     mocked_embedding_client.embeddings.create.assert_not_called()
+
 
 # Usage
 # Save this test in a file named test_your_module.py

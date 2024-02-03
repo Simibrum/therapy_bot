@@ -6,7 +6,6 @@ from backend.llm.common import num_tokens_from_messages
 
 
 class TestNumTokensFromMessages:
-
     #  Returns the correct number of tokens for a single message with no name and no additional keys.
     def test_single_message_no_name_no_additional_keys(self):
         # I have test_client and user_instance

@@ -13,18 +13,18 @@ from logic.therapy_session_logic import TherapySessionLogic
 from models import User, Therapist, Chat, TherapySession
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def setup_testing_environment():
     print("Setting up testing environment")
-    existing_env = os.environ.get('CONFIG_ENV')
-    os.environ['CONFIG_ENV'] = 'testing'
+    existing_env = os.environ.get("CONFIG_ENV")
+    os.environ["CONFIG_ENV"] = "testing"
     yield  # This will return control to the test function
     if existing_env:
-        os.environ['CONFIG_ENV'] = existing_env  # Revert env var in teardown
+        os.environ["CONFIG_ENV"] = existing_env  # Revert env var in teardown
     print("Tearing down testing environment")
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def db_setup():
     print("Setting up test class & generating DB file")
     TestConfig.generate_temp_file()
@@ -71,7 +71,7 @@ def user_instance(shared_session):
     user = User(
         username="testuser",
         password_hash="hashedpassword",  # Temporary hash - password is set below
-        email="test@example.com"
+        email="test@example.com",
     )
     user.set_password("hashedpassword")
     user.first_name = "Test"
@@ -96,7 +96,7 @@ def therapist_instance(shared_session, user_instance):
         last_name="Therapist",
         user_id=user_instance.id,
         residence="Test City",
-        description="Test Description"
+        description="Test Description",
     )
     shared_session.add(therapist)
     shared_session.commit()
@@ -106,10 +106,7 @@ def therapist_instance(shared_session, user_instance):
 @pytest.fixture
 def therapy_session_instance(shared_session, user_instance, therapist_instance):
     """Create a therapy session instance."""
-    therapy_session = TherapySession(
-        user=user_instance,
-        therapist=therapist_instance
-    )
+    therapy_session = TherapySession(user=user_instance, therapist=therapist_instance)
     shared_session.add(therapy_session)
     shared_session.commit()
     return therapy_session
@@ -122,13 +119,15 @@ def therapy_session_logic_instance(shared_session, therapy_session_instance):
 
 
 @pytest.fixture
-def chat_instance(shared_session, user_instance, therapist_instance, therapy_session_instance):
+def chat_instance(
+    shared_session, user_instance, therapist_instance, therapy_session_instance
+):
     """Create a chat instance."""
     chat = Chat(
         user=user_instance,
         therapist=therapist_instance,
         sender="user",
-        therapy_session=therapy_session_instance
+        therapy_session=therapy_session_instance,
     )
     chat.text = "Hello, how are you?"
     shared_session.add(chat)
@@ -139,8 +138,8 @@ def chat_instance(shared_session, user_instance, therapist_instance, therapy_ses
 @pytest.fixture
 def mocked_embedding_client(mocker):
     """Mock the embedding client."""
-    EmbeddingResponse = namedtuple('EmbeddingResponse', ['data'])
-    EmbeddingData = namedtuple('EmbeddingData', ['embedding'])
+    EmbeddingResponse = namedtuple("EmbeddingResponse", ["data"])
+    EmbeddingData = namedtuple("EmbeddingData", ["embedding"])
 
     # Create an instance of the EmbeddingData named tuple
     embedding_data = EmbeddingData(embedding=[0.1, 0.2, 0.3])
@@ -148,7 +147,7 @@ def mocked_embedding_client(mocker):
     # Wrap it in the EmbeddingResponse named tuple
     mock_response = EmbeddingResponse(data=[embedding_data])
 
-    mocked_client = mocker.patch('llm.common.client')
+    mocked_client = mocker.patch("llm.common.client")
     mocked_client.embeddings.create.return_value = mock_response
     return mocked_client
 
@@ -159,5 +158,5 @@ def mocked_chat_completion(mocker):
     # Mock the get_chat_completion function
     return mocker.patch(
         "logic.therapy_session_logic.get_chat_completion",
-        return_value="Welcome to your therapy session!"
+        return_value="Welcome to your therapy session!",
     )

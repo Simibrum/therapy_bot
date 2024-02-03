@@ -24,10 +24,10 @@ def test_user(db_setup, user_instance):
     assert not retrieved_user.is_anonymous
     assert retrieved_user.id == user_instance.id
     assert retrieved_user.as_dict() == {
-        'id': 1,
-        'username': 'testuser',
-        'email': 'test@example.com',
-        'role': 'user',
+        "id": 1,
+        "username": "testuser",
+        "email": "test@example.com",
+        "role": "user",
     }
 
     session.close()

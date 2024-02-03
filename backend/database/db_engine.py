@@ -6,8 +6,10 @@ for replacement of db.session
 """
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
 from config import get_config
 from config.init_logger import logger
+
 
 # See `config.create_tables` for table creation
 
@@ -22,7 +24,7 @@ class DBSessionManager:
         if config is None:
             config = get_config()
         if cls._Session is None:
-            logger.info(f"Getting session")
+            logger.info("Getting session")
             cls._Session = cls.get_session_factory(config)
         return cls._Session()
 
@@ -32,7 +34,7 @@ class DBSessionManager:
         if config is None:
             config = get_config()
         if cls._Session is None:
-            logger.debug(f"Initializing database - getting session factory")
+            logger.debug("Initializing database - getting session factory")
             engine_instance = cls.get_engine(config)
             cls._Session = sessionmaker(bind=engine_instance)
         return cls._Session
@@ -47,7 +49,9 @@ class DBSessionManager:
                 config.SQLALCHEMY_DATABASE_URI,
                 **config.SQLALCHEMY_ENGINE_OPTIONS,
             )
-            logger.info(f"Initializing database - created engine instance - {cls._engine.url}")
+            logger.info(
+                f"Initializing database - created engine instance - {cls._engine.url}"
+            )
         return cls._engine
 
 

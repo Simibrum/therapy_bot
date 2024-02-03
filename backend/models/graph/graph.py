@@ -8,7 +8,7 @@ from app.schemas.pydantic_nodes import NodeOut
 
 
 class Graph(object):
-    """ Based on object here -
+    """Based on object here -
     https://www.python-course.eu/graphs_python.php.
 
     This exists as an in memory wrapper around the graph database.
@@ -19,9 +19,9 @@ class Graph(object):
     """
 
     def __init__(self, spacy_token=None):
-        """ initializes a graph object
-            If no dictionary or None is given,
-            an empty dictionary will be used
+        """initializes a graph object
+        If no dictionary or None is given,
+        an empty dictionary will be used
         """
         self.__graph_dict = OrderedDict()
         if spacy_token:
@@ -29,17 +29,17 @@ class Graph(object):
 
     @property
     def nodes(self):
-        """ returns the nodes of a graph """
+        """returns the nodes of a graph"""
         return list(self.__graph_dict.keys())
 
     @property
     def edges(self):
-        """ returns the edges of a graph """
+        """returns the edges of a graph"""
         return self.__generate_edges()
 
     @property
     def edge_indices(self):
-        """ returns edges in terms of indices in nodes"""
+        """returns edges in terms of indices in nodes"""
         return [
             (self.nodes.index(node1), self.nodes.index(node2))
             for node1, node2 in self.edges
@@ -47,12 +47,12 @@ class Graph(object):
 
     @property
     def node_labels(self):
-        """ Return all node labels."""
+        """Return all node labels."""
         return [n.label for n in self.nodes]
 
     @property
     def adj_mat(self):
-        """ Return adjacency matrix as a numpy array.
+        """Return adjacency matrix as a numpy array.
         parent>child connections are indicated with +1,
         child>parent with -1
         """
@@ -65,10 +65,10 @@ class Graph(object):
         return A
 
     def add_node(self, node_label, token=None):
-        """ If the node "node" is not in
-            self.__graph_dict, a key "node" with an empty
-            list as a value is added to the dictionary.
-            Otherwise nothing has to be done.
+        """If the node "node" is not in
+        self.__graph_dict, a key "node" with an empty
+        list as a value is added to the dictionary.
+        Otherwise nothing has to be done.
         """
         if node_label not in self.node_labels:
             # Create a new node from the label
@@ -81,8 +81,8 @@ class Graph(object):
                     return node
 
     def add_edge(self, edge):
-        """ assumes that edge is of type set, tuple or list;
-            between two nodes can be multiple edges!
+        """assumes that edge is of type set, tuple or list;
+        between two nodes can be multiple edges!
         """
         (node1, node2) = tuple(edge)
         if not isinstance(node1, Node):
@@ -97,10 +97,10 @@ class Graph(object):
             self.__graph_dict[node1] = [node2]
 
     def __generate_edges(self):
-        """ A static method generating the edges of the
-            graph "graph". Edges are represented as sets
-            with one (a loop back to the node) or two
-            node
+        """A static method generating the edges of the
+        graph "graph". Edges are represented as sets
+        with one (a loop back to the node) or two
+        node
         """
         edges = []
         for node in self.__graph_dict:
@@ -124,12 +124,12 @@ class Graph(object):
         parent_node.tokens = parent_node.tokens + child_node.tokens
         # Sort parent_node tokens
         parent_node.tokens.sort(key=lambda token: token.i)
-        parent_node.label = " ".join([
-            "{0}_{1}_{2}_{3}".format(
-                token.text, token.tag_, token.dep_, token.i
-            )
-            for token in parent_node.tokens
-        ])
+        parent_node.label = " ".join(
+            [
+                "{0}_{1}_{2}_{3}".format(token.text, token.tag_, token.dep_, token.i)
+                for token in parent_node.tokens
+            ]
+        )
         # Reconnect any dangling grandchildren
         grandchildren = self.__graph_dict[child_node]
         if grandchildren:
@@ -138,7 +138,7 @@ class Graph(object):
         return parent_node
 
     def remove_node(self, node):
-        """ Delete a node. """
+        """Delete a node."""
         self.__graph_dict.pop(node, None)
         # Also remove from all entries of graph_dict
         for existing_node, entries in self.__graph_dict.items():
@@ -149,7 +149,7 @@ class Graph(object):
         pass
 
     def get_graphviz(self):
-        """ Visualise via Graphviz."""
+        """Visualise via Graphviz."""
         gv = Digraph()
         for node in self.nodes:
             gv.node(node.label)
@@ -158,21 +158,19 @@ class Graph(object):
         return gv
 
     def get_rootgraph(self):
-        """ Return a graph with just root tokens."""
+        """Return a graph with just root tokens."""
         gv = Digraph()
         for node in self.nodes:
-            gv.node(
-                "{0}_{1}".format(node.root_token.text, node.root_token.i)
-            )
+            gv.node("{0}_{1}".format(node.root_token.text, node.root_token.i))
         for node1, node2 in self.edges:
             gv.edge(
                 "{0}_{1}".format(node1.root_token.text, node1.root_token.i),
-                "{0}_{1}".format(node2.root_token.text, node2.root_token.i)
+                "{0}_{1}".format(node2.root_token.text, node2.root_token.i),
             )
         return gv
 
     def build_graph(self, token):
-        """ Print a graph ."""
+        """Print a graph ."""
         # Add node to graph
         node_name = "{0}_{1}_{2}_{3}".format(
             token.text, token.tag_, token.dep_, token.i
@@ -184,7 +182,7 @@ class Graph(object):
         return node_name
 
     def flatten_graph(self):
-        """ Merge nodes with no children into parent node."""
+        """Merge nodes with no children into parent node."""
         # Does this need to run recursively?
         nodes_to_pop = []
         for node in self.nodes:
@@ -199,7 +197,7 @@ class Graph(object):
             self.remove_node(ntp)
 
     def merge_single_children(self):
-        """ Merge nodes with single children."""
+        """Merge nodes with single children."""
 
         nodes_to_pop = []
         nodes_to_merge = []
@@ -218,8 +216,7 @@ class Graph(object):
             parent_node, child_node = nodes_to_merge.pop()
             updated_parent_node = self.merge_nodes(parent_node, child_node)
             nodes_to_merge = [
-                (updated_parent_node, c) if p == child_node
-                else (p, c)
+                (updated_parent_node, c) if p == child_node else (p, c)
                 for p, c in nodes_to_merge
             ]
 

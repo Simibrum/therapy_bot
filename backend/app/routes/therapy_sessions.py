@@ -23,7 +23,9 @@ def verify_token(token: str) -> Union[User, None]:
 
 
 @router.get("/sessions")
-def get_sessions(session: Session = Depends(get_db), current_user: User = Depends(manager)) -> TherapySessionListOut:
+def get_sessions(
+    session: Session = Depends(get_db), current_user: User = Depends(manager)
+) -> TherapySessionListOut:
     """Get all therapy sessions for the current user."""
     if not current_user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -44,10 +46,7 @@ def new_session(current_user: User = Depends(manager)):
 
 
 @router.websocket("/ws/session/{therapy_session_id}")
-async def websocket_endpoint(
-        websocket: WebSocket,
-        therapy_session_id: int
-):
+async def websocket_endpoint(websocket: WebSocket, therapy_session_id: int):
     """Websocket endpoint for the therapy session."""
     await websocket.accept()
     try:
@@ -71,7 +70,9 @@ async def websocket_endpoint(
 
         logger.info("Getting initial messages")
         # Get the therapy session - TODO needs to be async
-        therapy_session = TherapySessionLogic(pre_existing_session_id=therapy_session_id)
+        therapy_session = TherapySessionLogic(
+            pre_existing_session_id=therapy_session_id
+        )
         if not therapy_session:
             await websocket.send_text("No therapy session found")
             await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
@@ -79,7 +80,7 @@ async def websocket_endpoint(
         # Get existing or initial chat messages  - TODO needs to be async
         messages_to_send = therapy_session.get_messages()
         # Send initial therapist message
-        await websocket.send_json(messages_to_send.model_dump(mode='json'))
+        await websocket.send_json(messages_to_send.model_dump(mode="json"))
 
         while True:
             logger.info("Entering Chat While Loop - Waiting for message")
@@ -88,11 +89,12 @@ async def websocket_endpoint(
             # Process user message and generate therapist response - TODO needs to be async
             messages_to_send = therapy_session.generate_response(user_text)
             # Send therapist response
-            await websocket.send_json(messages_to_send.model_dump(mode='json'))
+            await websocket.send_json(messages_to_send.model_dump(mode="json"))
     except WebSocketDisconnect:
         pass
     finally:
-        if websocket.application_state == WebSocketState.CONNECTED \
-                and websocket.client_state == WebSocketState.CONNECTED:
+        if (
+            websocket.application_state == WebSocketState.CONNECTED
+            and websocket.client_state == WebSocketState.CONNECTED
+        ):
             await websocket.close()
-

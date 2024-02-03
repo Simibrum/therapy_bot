@@ -36,3 +36,9 @@ numpy
 
 # Graph stuff
 graphviz
+
+# Development
+pre-commit
+ruff
+wily
+bandit

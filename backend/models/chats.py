@@ -14,12 +14,18 @@ from utils.text_crypto import encrypt_string, decrypt_string
 
 
 class Chat(Base, BytesVectorMixin):
-    __tablename__ = 'chats'
+    __tablename__ = "chats"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
-    therapist_id: Mapped[int] = mapped_column(ForeignKey('therapists.id'), nullable=False)
-    therapy_session_id: Mapped[int] = mapped_column(ForeignKey('therapy_sessions.id'), nullable=False)
-    timestamp: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, default=func.now())
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    therapist_id: Mapped[int] = mapped_column(
+        ForeignKey("therapists.id"), nullable=False
+    )
+    therapy_session_id: Mapped[int] = mapped_column(
+        ForeignKey("therapy_sessions.id"), nullable=False
+    )
+    timestamp: Mapped[datetime.datetime] = mapped_column(
+        DateTime, nullable=False, default=func.now()
+    )
     # Sender is "user" or "therapist"
     sender: Mapped[str] = mapped_column(String(10), nullable=False)
     # This is the text of the chat, to be encrypted with the user's encryption key as below
@@ -40,7 +46,9 @@ class Chat(Base, BytesVectorMixin):
             str: The decrypted string.
         """
         if self._encrypted_text:
-            plaintext = decrypt_string(self.user.encryption_key.encode(), self._encrypted_text)
+            plaintext = decrypt_string(
+                self.user.encryption_key.encode(), self._encrypted_text
+            )
             return plaintext
         return ""
 
@@ -52,7 +60,9 @@ class Chat(Base, BytesVectorMixin):
         Parameters:
             plaintext (str): The string to be encrypted.
         """
-        self._encrypted_text = encrypt_string(self.user.encryption_key.encode(), plaintext)
+        self._encrypted_text = encrypt_string(
+            self.user.encryption_key.encode(), plaintext
+        )
 
     def fetch_text_vector(self) -> np.array:
         """Fetch the embedding for the text."""
@@ -62,4 +72,3 @@ class Chat(Base, BytesVectorMixin):
         else:
             self.vector = None
         return self.vector
-

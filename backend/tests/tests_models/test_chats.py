@@ -1,9 +1,10 @@
 """Tests for the chats models."""
-import pytest
-from models import Chat
-from sqlalchemy.orm import sessionmaker
-import numpy as np
 from unittest.mock import patch
+
+import numpy as np
+from sqlalchemy.orm import sessionmaker
+
+from models import Chat
 
 
 def test_chat_model(db_setup, user_instance, therapist_instance, chat_instance):
@@ -30,8 +31,10 @@ def test_chat_model(db_setup, user_instance, therapist_instance, chat_instance):
     session.close()
 
 
-@patch('models.chats.get_embedding', return_value=np.array([0.1, 0.2, 0.3]))
-def test_fetch_text_vector(mock_get_embedding, db_setup, user_instance, therapist_instance, chat_instance):
+@patch("models.chats.get_embedding", return_value=np.array([0.1, 0.2, 0.3]))
+def test_fetch_text_vector(
+    mock_get_embedding, db_setup, user_instance, therapist_instance, chat_instance
+):
     test_engine = db_setup
     Session = sessionmaker(bind=test_engine)
     session = Session()
