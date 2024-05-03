@@ -1,8 +1,8 @@
 """Common model for specific node types in the knowledge graph."""
 
-from sqlalchemy import Integer, ForeignKey
+from sqlalchemy import ForeignKey, Integer
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import mapped_column, Mapped, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base
 

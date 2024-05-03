@@ -1,6 +1,7 @@
 """Configuration for the backend."""
 import os
 import tempfile
+from zoneinfo import ZoneInfo
 
 from config.helper_functions import load_from_env_file
 from config.init_logger import logger
@@ -20,6 +21,10 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 # Set the token time out value
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 REFRESH_TOKEN_EXPIRE_DAYS = 7
+
+# Set Timezone
+TIMEZONE = os.getenv("TIMEZONE", "UTC")
+TZ_INFO = ZoneInfo(TIMEZONE)
 
 
 class ProductionConfig:

@@ -2,7 +2,7 @@
 from models.chats import Chat
 from models.therapists import Therapist
 from models.therapy_session import TherapySession
-from models.users import User, RoleEnum
+from models.users import RoleEnum, User
 
 __all__ = [
     "User",

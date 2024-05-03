@@ -15,9 +15,7 @@ def get_chat_completion(
     if history:
         messages.append({"role": "user", "content": history})
     if briefing_messages:
-        messages.extend(
-            [{"role": "user", "content": message} for message in briefing_messages]
-        )
+        messages.extend([{"role": "user", "content": message} for message in briefing_messages])
 
     messages.append({"role": "user", "content": next_message_prompt})
 

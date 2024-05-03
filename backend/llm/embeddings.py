@@ -5,32 +5,29 @@ from config import openai_api_key
 from llm.common import api_request
 
 
-def get_embedding(
-    text: str, model: str = "text-embedding-ada-002", api_key: str = openai_api_key
-) -> np.array:
+def get_embedding(text: str, model: str = "text-embedding-ada-002", api_key: str = openai_api_key) -> np.array:
     """
     Get the embedding for a given text using the OpenAI Embedding API.
 
     Args:
+    ----
         text: The input text as a list of strings.
         model: The model name or ID to use for embeddings. Default is "text-embedding-ada-002".
         api_key: The OpenAI API key to use for embeddings. Default is the value of the OPENAI_API_KEY environment
             variable.
 
     Returns:
+    -------
         An embedding as a numpy array.
+
     """
     vector_result = api_request(text=text, messages=[], model=model)
     return np.array(vector_result)
 
 
-def compute_cosine_similarities(
-    query_embedding: np.array, embeddings_matrix: np.array
-) -> np.array:
+def compute_cosine_similarities(query_embedding: np.array, embeddings_matrix: np.array) -> np.array:
     """Compute the cosine similarities between a query embedding and a matrix of embeddings."""
-    if not isinstance(query_embedding, np.ndarray) or not isinstance(
-        embeddings_matrix, np.ndarray
-    ):
+    if not isinstance(query_embedding, np.ndarray) or not isinstance(embeddings_matrix, np.ndarray):
         raise TypeError("Input arrays must be numpy arrays.")
     if query_embedding.size == 0 or embeddings_matrix.size == 0:
         raise ValueError("Input arrays cannot be empty.")

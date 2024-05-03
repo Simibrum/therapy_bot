@@ -4,7 +4,7 @@ import pytest
 from llm.chat_completion import get_chat_completion
 
 
-@pytest.fixture
+@pytest.fixture()
 def mock_api_request(mocker):
     """Fixture to mock the api_request function."""
     mock = mocker.patch("llm.chat_completion.api_request", autospec=True)

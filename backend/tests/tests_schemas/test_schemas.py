@@ -3,10 +3,10 @@ import datetime
 
 import pytest
 
-from app.schemas.pydantic_chats import ChatOut, ChatListOut
+from app.schemas.pydantic_chats import ChatListOut, ChatOut
 
 
-@pytest.fixture
+@pytest.fixture()
 def chat_out_instance():
     """Fixture to create a ChatOut instance."""
     return ChatOut(
@@ -20,7 +20,7 @@ def chat_out_instance():
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def chat_list_out_instance(chat_out_instance):
     """Fixture to create a ChatListOut instance."""
     return ChatListOut(messages=[chat_out_instance, chat_out_instance])
@@ -34,7 +34,5 @@ def test_chat_out_as_string(chat_out_instance):
 
 def test_chat_list_out_as_string(chat_list_out_instance):
     """Test the as_string method of ChatListOut."""
-    expected_string = (
-        "user: Hello!\n(2023-11-03 10:00:00)\n\nuser: Hello!\n(2023-11-03 10:00:00)"
-    )
+    expected_string = "user: Hello!\n(2023-11-03 10:00:00)\n\nuser: Hello!\n(2023-11-03 10:00:00)"
     assert chat_list_out_instance.as_string() == expected_string

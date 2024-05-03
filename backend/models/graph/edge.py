@@ -1,13 +1,15 @@
-"""This module contains the Edge model."""
+"""Module contains the Edge model."""
 
-from sqlalchemy import String, ForeignKey, Integer
-from sqlalchemy.orm import mapped_column, Mapped, relationship
+from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base
 from models.bytes_vector_mixin import BytesVectorMixin
 
 
 class Edge(Base, BytesVectorMixin):
+    """Edge in a graph."""
+
     __tablename__ = "edges"
     id: Mapped[int] = mapped_column(primary_key=True)
 

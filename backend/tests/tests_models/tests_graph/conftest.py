@@ -5,7 +5,7 @@ import pytest
 from models.graph.node import Node
 
 
-@pytest.fixture
+@pytest.fixture()
 def node(shared_session):
     """Return a node."""
     node = Node("test_label")

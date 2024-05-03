@@ -1,7 +1,7 @@
 """Tests for the users models."""
 from sqlalchemy.orm import sessionmaker
 
-from models import User, RoleEnum
+from models import RoleEnum, User
 
 
 def test_user(db_setup, user_instance):

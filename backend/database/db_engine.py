@@ -4,8 +4,8 @@ See https://stackoverflow.com/questions/59793920/
 how-to-make-sqlalchemy-engine-available-throughout-the-flask-application
 for replacement of db.session
 """
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Engine, create_engine
+from sqlalchemy.orm import Session, sessionmaker
 
 from config import get_config
 from config.init_logger import logger
@@ -15,11 +15,13 @@ from config.init_logger import logger
 
 
 class DBSessionManager:
+    """Class to manage the database session."""
+
     _engine = None
     _Session = None
 
     @classmethod
-    def get_session(cls, config=None):
+    def get_session(cls, config=None) -> Session:
         """Get a session from the sessionmaker."""
         if config is None:
             config = get_config()
@@ -29,7 +31,7 @@ class DBSessionManager:
         return cls._Session()
 
     @classmethod
-    def get_session_factory(cls, config=None):
+    def get_session_factory(cls, config=None) -> sessionmaker:
         """Get a session factory."""
         if config is None:
             config = get_config()
@@ -40,7 +42,7 @@ class DBSessionManager:
         return cls._Session
 
     @classmethod
-    def get_engine(cls, config=None):
+    def get_engine(cls, config=None) -> Engine:
         """Get an engine instance."""
         if config is None:
             config = get_config()
@@ -49,13 +51,11 @@ class DBSessionManager:
                 config.SQLALCHEMY_DATABASE_URI,
                 **config.SQLALCHEMY_ENGINE_OPTIONS,
             )
-            logger.info(
-                f"Initializing database - created engine instance - {cls._engine.url}"
-            )
+            logger.info(f"Initializing database - created engine instance - {cls._engine.url}")
         return cls._engine
 
 
-def get_db():
+def get_db() -> Session:
     """Get a database session from the pool."""
     try:
         session_manager = DBSessionManager()

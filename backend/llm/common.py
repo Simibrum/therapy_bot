@@ -18,9 +18,7 @@ client = OpenAI(api_key=openai_api_key)
 # TODO Switch to ASync Client
 def chat_completion_wrapper(model, messages, temperature: float = 0.7):
     """Wrap the openai chat completion API to allow test substitution."""
-    response = client.chat.completions.create(
-        model=model, messages=messages, temperature=temperature
-    )
+    response = client.chat.completions.create(model=model, messages=messages, temperature=temperature)
     response = response.choices[0].message.content
     return response
 
@@ -52,24 +50,17 @@ def api_request(
                 result = response.data[0].embedding
             else:
                 gen_logger.info(f"Making API request with {model}")
-                result = chat_completion_wrapper(
-                    model, messages, temperature=temperature
-                )
+                result = chat_completion_wrapper(model, messages, temperature=temperature)
             return result
         except Exception as e:
             if attempt == max_tries:
-                gen_logger.error(
-                    f"API request failed after {attempt} attempts with final error {e}."
-                )
+                gen_logger.error(f"API request failed after {attempt} attempts with final error {e}.")
                 return []
 
             delay = min(initial_delay * (backoff_factor ** (attempt - 1)), max_delay)
             jitter = random.uniform(jitter_range[0], jitter_range[1])  # nosec: B311
             sleep_time = delay + jitter
-            gen_logger.error(
-                f"API request failed with error: {e}. "
-                f"Retrying in {sleep_time:.2f} seconds."
-            )
+            gen_logger.error(f"API request failed with error: {e}. " f"Retrying in {sleep_time:.2f} seconds.")
             time.sleep(sleep_time)
 
 
@@ -82,9 +73,7 @@ def num_tokens_from_messages(messages, model="gpt-3.5-turbo-0301"):
     if model == "gpt-3.5-turbo-0301":  # note: future models may deviate from this
         num_tokens = 0
         for message in messages:
-            num_tokens += (
-                4  # every message follows <im_start>{role/name}\n{content}<im_end>\n
-            )
+            num_tokens += 4  # every message follows <im_start>{role/name}\n{content}<im_end>\n
             for key, value in message.items():
                 num_tokens += len(encoding.encode(value))
                 if key == "name":  # if there's a name, the role is omitted
@@ -92,6 +81,4 @@ def num_tokens_from_messages(messages, model="gpt-3.5-turbo-0301"):
             num_tokens += 2  # every reply is primed with <im_start>assistant
         return num_tokens
     else:
-        raise NotImplementedError(
-            f"""num_tokens_from_messages() is not presently implemented for model {model}."""
-        )
+        raise NotImplementedError(f"""num_tokens_from_messages() is not presently implemented for model {model}.""")

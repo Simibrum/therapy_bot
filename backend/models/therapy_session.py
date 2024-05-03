@@ -1,6 +1,6 @@
 """Model for a therapy session."""
 
-from sqlalchemy import Column, Integer, ForeignKey, DateTime, func
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, func
 from sqlalchemy.orm import relationship
 
 from database import Base

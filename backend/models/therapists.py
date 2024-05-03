@@ -1,7 +1,7 @@
 """Class model for a therapist."""
 
-from sqlalchemy import Integer, String, ForeignKey
-from sqlalchemy.orm import relationship, mapped_column, Mapped
+from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base
 

@@ -2,7 +2,7 @@
 import numpy as np
 from sqlalchemy import LargeBinary
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy.orm import Mapped, mapped_column
 
 from config import logger
 
@@ -44,9 +44,7 @@ class BytesVectorMixin:
                 raise ValueError(f"Vector must be 1D, not {len(vector.shape)}D.")
             # Validate the vector - elements should be floats or ints
             if not np.issubdtype(vector.dtype, np.number):
-                raise ValueError(
-                    f"Vector elements must be numbers, not {vector.dtype}."
-                )
+                raise ValueError(f"Vector elements must be numbers, not {vector.dtype}.")
             # If entries are ints convert to floats
             if np.issubdtype(vector.dtype, np.integer):
                 vector = vector.astype(float)

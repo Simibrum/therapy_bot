@@ -1,7 +1,7 @@
 """Mixins for the Chats model."""
-from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy import Column, ForeignKey, Integer
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import relationship, declared_attr, backref
+from sqlalchemy.orm import backref, declared_attr, relationship
 
 from models.chats import ChatReferenceAssociation
 

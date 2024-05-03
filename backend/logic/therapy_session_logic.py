@@ -3,37 +3,29 @@ from typing import Optional
 
 import numpy as np
 
-import llm.prompt_builder as prompt_builder
-from app.schemas import UserOut, TherapistOut, ChatOut, ChatListOut
+from app.schemas import ChatListOut, ChatOut, TherapistOut, UserOut
 from config import logger
 from database.db_engine import DBSessionManager
+from llm import prompt_builder
 from llm.chat_completion import get_chat_completion
-from models import User, Therapist, Chat, TherapySession
+from models import Chat, Therapist, TherapySession, User
 
 
 # Define exceptions
 class TherapySessionDoesNotExistError(Exception):
     """Exception raised when a therapy session does not exist."""
 
-    pass
-
 
 class UserIdMismatchError(Exception):
     """Exception raised when a user id does not match."""
-
-    pass
 
 
 class TherapistIdMismatchError(Exception):
     """Exception raised when a therapist id does not match."""
 
-    pass
-
 
 class TherapistDoesNotExistError(Exception):
     """Exception raised when a therapy session does not exist."""
-
-    pass
 
 
 class TherapySessionLogic:
@@ -70,20 +62,14 @@ class TherapySessionLogic:
             logger.debug("Creating new therapy session")
             self.therapy_session_id = self.create_therapy_session()
         else:
-            raise ValueError(
-                "Must provide either a user id or a pre-existing session id"
-            )
+            raise ValueError("Must provide either a user id or a pre-existing session id")
         self.system_prompt = self.build_system_prompt()
 
     @property
     def first_chat(self) -> bool:
         """Check if this is the first chat in the session."""
         with self.db_session_manager.get_session() as session:
-            first_chat = (
-                session.query(Chat)
-                .filter(Chat.therapy_session_id == self.therapy_session_id)
-                .first()
-            )
+            first_chat = session.query(Chat).filter(Chat.therapy_session_id == self.therapy_session_id).first()
             return first_chat is None
 
     def get_therapy_session(self, therapy_session_id: int = None) -> TherapySession:
@@ -93,19 +79,13 @@ class TherapySessionLogic:
                 raise ValueError("Must provide a therapy session id")
             therapy_session_id = self.therapy_session_id
         with self.db_session_manager.get_session() as session:
-            therapy_session = (
-                session.query(TherapySession)
-                .filter(TherapySession.id == therapy_session_id)
-                .first()
-            )
+            therapy_session = session.query(TherapySession).filter(TherapySession.id == therapy_session_id).first()
             return therapy_session
 
     def create_therapy_session(self):
         """Create a new therapy session."""
         with self.db_session_manager.get_session() as session:
-            new_therapy_session = TherapySession(
-                user_id=self.user_id, therapist_id=self.therapist_id
-            )
+            new_therapy_session = TherapySession(user_id=self.user_id, therapist_id=self.therapist_id)
             session.add(new_therapy_session)
             session.commit()
             session.refresh(new_therapy_session)
@@ -114,11 +94,7 @@ class TherapySessionLogic:
     def get_therapist_id(self) -> Optional[int]:
         """Get the therapist id."""
         with self.db_session_manager.get_session() as session:
-            therapist = (
-                session.query(Therapist)
-                .filter(Therapist.user_id == self.user_id)
-                .first()
-            )
+            therapist = session.query(Therapist).filter(Therapist.user_id == self.user_id).first()
             if not therapist:
                 raise TherapistDoesNotExistError("Therapist does not exist")
             return therapist.id
@@ -128,19 +104,12 @@ class TherapySessionLogic:
         with self.db_session_manager.get_session() as session:
             previous_chats = (
                 session.query(Chat)
-                .filter(
-                    (Chat.user_id == self.user_id)
-                    & (Chat.therapist_id == self.therapist_id)
-                )
+                .filter((Chat.user_id == self.user_id) & (Chat.therapist_id == self.therapist_id))
                 .order_by(Chat.timestamp.asc())
                 .all()
             )
-            self.chat_vectors = np.vstack(
-                [chat.vector for chat in previous_chats if chat.vector is not None]
-            )
-            self.index_to_id = {
-                index: chat.id for index, chat in enumerate(previous_chats)
-            }
+            self.chat_vectors = np.vstack([chat.vector for chat in previous_chats if chat.vector is not None])
+            self.index_to_id = {index: chat.id for index, chat in enumerate(previous_chats)}
 
     def add_chat_message(self, sender, text) -> ChatOut:
         """Add a new chat message to the history and update the vector matrix."""
@@ -196,11 +165,7 @@ class TherapySessionLogic:
         """Build the system prompt."""
         with self.db_session_manager.get_session() as session:
             user = session.query(User).filter(User.id == self.user_id).first()
-            therapist = (
-                session.query(Therapist)
-                .filter(Therapist.id == self.therapist_id)
-                .first()
-            )
+            therapist = session.query(Therapist).filter(Therapist.id == self.therapist_id).first()
             user_out = UserOut.model_validate(user)
             therapist_out = TherapistOut.model_validate(therapist)
         return prompt_builder.build_system_prompt(user_out, therapist_out)
@@ -208,11 +173,7 @@ class TherapySessionLogic:
     def get_therapy_session_messages(self) -> ChatListOut:
         """Get all messages in the therapy session."""
         with self.db_session_manager.get_session() as session:
-            messages = (
-                session.query(Chat)
-                .filter(Chat.therapy_session_id == self.therapy_session_id)
-                .all()
-            )
+            messages = session.query(Chat).filter(Chat.therapy_session_id == self.therapy_session_id).all()
             chat_list_out = ChatListOut(messages=messages)
             return chat_list_out
 
@@ -224,25 +185,19 @@ class TherapySessionLogic:
         ]
         first_message = prompt_builder.build_first_message_prompt()
         # Get the first message from the therapist
-        response = get_chat_completion(
-            first_message, self.system_prompt, briefing_messages=briefing_messages
-        )
+        response = get_chat_completion(first_message, self.system_prompt, briefing_messages=briefing_messages)
         self.add_chat_message("therapist", response)
         return self.get_therapy_session_messages()
 
     def generate_response(self, user_input) -> ChatListOut:
         """Generate a response using the ChatCompletion API."""
         # Get the history
-        history = prompt_builder.build_recent_session_history(
-            self.get_therapy_session_messages()
-        )
+        history = prompt_builder.build_recent_session_history(self.get_therapy_session_messages())
         # Add the user input to the chat history
         self.add_chat_message("user", user_input)
         next_message_prompt = prompt_builder.build_next_message_prompt(user_input)
         # This needs to use the history to prevent "Hello [User]" being repeated
-        response = get_chat_completion(
-            next_message_prompt, self.system_prompt, history=history
-        )
+        response = get_chat_completion(next_message_prompt, self.system_prompt, history=history)
         chat_out = self.add_chat_message("therapist", response)
         return ChatListOut(messages=[chat_out])
 

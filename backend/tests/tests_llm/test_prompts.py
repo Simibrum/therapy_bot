@@ -1,6 +1,6 @@
 """Testing out the prompts."""
 
-from app.schemas import UserOut, TherapistOut
+from app.schemas import TherapistOut, UserOut
 from llm.prompt_builder import (
     build_first_message_prompt,
     build_new_session_prompt,

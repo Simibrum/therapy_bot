@@ -8,9 +8,7 @@ def test_new_session_unauthenticated(test_client, user_instance):
     assert response.status_code == 401
 
 
-def test_new_session_authenticated(
-    authenticated_test_client, therapist_instance, user_instance
-):
+def test_new_session_authenticated(authenticated_test_client, therapist_instance, user_instance):
     """Test generating a new therapy session."""
     # Try with authentication
     response = authenticated_test_client.post("/sessions/new")
@@ -25,9 +23,7 @@ def test_get_sessions_unauthenticated(test_client, user_instance):
     assert response.status_code == 401
 
 
-def test_get_sessions_authenticated(
-    authenticated_test_client, therapy_session_instance
-):
+def test_get_sessions_authenticated(authenticated_test_client, therapy_session_instance):
     """Test getting all therapy sessions for logged-in user."""
     # Try with authentication
     response = authenticated_test_client.get("/sessions")

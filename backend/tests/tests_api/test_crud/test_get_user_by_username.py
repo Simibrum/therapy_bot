@@ -4,6 +4,8 @@ from backend.app.crud.users import get_user_by_username
 
 
 class TestGetUserByUsername:
+    """Test the get_user_by_username function."""
+
     #  Retrieve an existing user by their username
     def test_retrieve_existing_user(self, shared_session, user_instance):
         session = shared_session

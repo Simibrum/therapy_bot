@@ -2,8 +2,8 @@
 
 from datetime import datetime
 
-from sqlalchemy import String, DateTime
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy import DateTime, String
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class LocationMixin:
@@ -35,18 +35,17 @@ class LifeDatesMixin:
         """
         Returns the age of the user based on the date of birth.
 
-        Returns:
+        Returns
+        -------
             int: The age of the user in years.
+
         """
         if self.date_of_birth:
             today = datetime.today()
             age = (
                 today.year
                 - self.date_of_birth.year
-                - (
-                    (today.month, today.day)
-                    < (self.date_of_birth.month, self.date_of_birth.day)
-                )
+                - ((today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day))
             )
             return age
         return -1

@@ -5,7 +5,7 @@ from config import logger
 from database import Base
 from database.db_engine import DBSessionManager
 # Need to import these even if not using them
-from models import User, Therapist
+from models import Therapist, User
 
 
 def create_default_user():

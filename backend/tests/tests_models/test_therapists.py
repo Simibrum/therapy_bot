@@ -13,9 +13,7 @@ def test_therapist(db_setup, user_instance, therapist_instance):
     session = Session()
 
     # Query the database to retrieve the therapist
-    retrieved_therapist = (
-        session.query(Therapist).filter_by(id=therapist_instance.id).one()
-    )
+    retrieved_therapist = session.query(Therapist).filter_by(id=therapist_instance.id).one()
 
     # Assert that the retrieved therapist's attributes match the original therapist's attributes
     assert retrieved_therapist.first_name == "Test"

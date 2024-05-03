@@ -9,7 +9,7 @@ from models.chats import Chat
 from tests import custom_chat_completion as custom_create
 
 
-@pytest.fixture
+@pytest.fixture()
 def therapy_session_logic_instance(user_instance, therapist_instance):
     """Generate a therapy session logic instance."""
     return TherapySessionLogic(user_instance.id, therapist_instance.id)
@@ -19,9 +19,7 @@ def test_generate_response(therapy_session_logic_instance, db_session_manager):
     """Test generating a response."""
     # Use the custom create function to use the gpt3.5 model
     with patch("llm.common.chat_completion_wrapper", custom_create):
-        chat_list_out = therapy_session_logic_instance.generate_response(
-            "Hello, therapist!"
-        )
+        chat_list_out = therapy_session_logic_instance.generate_response("Hello, therapist!")
         assert chat_list_out
         chat_out = chat_list_out.messages[0]
         assert len(chat_out.text) > 5

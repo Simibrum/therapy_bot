@@ -27,13 +27,9 @@ def login(
     if not username or not password:
         raise InvalidCredentialsException
     user = query_user(username, session)
-    if not user:
+    if not user or not (user.is_active and user.check_password(password)):
         raise InvalidCredentialsException
-    elif not (user.is_active and user.check_password(password)):
-        raise InvalidCredentialsException
-    access_token = manager.create_access_token(
-        data={"sub": username}, expires=timedelta(hours=1)
-    )
+    access_token = manager.create_access_token(data={"sub": username}, expires=timedelta(hours=1))
     return UserLoginOut(
         access_token=access_token,
         token_type="bearer",

@@ -1,20 +1,29 @@
 """Configuration for testing."""
+from __future__ import annotations
+
 import os
-from collections import namedtuple
 from datetime import datetime
+from typing import TYPE_CHECKING, NamedTuple
 
 import pytest
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
-from config import TestConfig
+from config import TZ_INFO, TestConfig
 from database import Base
 from database.db_engine import DBSessionManager
 from logic.therapy_session_logic import TherapySessionLogic
-from models import User, Therapist, Chat, TherapySession
+from models import Chat, Therapist, TherapySession, User
+
+if TYPE_CHECKING:
+    from unittest.mock import AsyncMock, MagicMock, NonCallableMagicMock
+
+    from pytest_mock import MockerFixture
+    from sqlalchemy.engine import Engine
 
 
 @pytest.fixture(scope="session", autouse=True)
-def setup_testing_environment():
+def _setup_testing_environment() -> None:
+    """Set up the testing environment."""
     print("Setting up testing environment")
     existing_env = os.environ.get("CONFIG_ENV")
     os.environ["CONFIG_ENV"] = "testing"
@@ -24,14 +33,15 @@ def setup_testing_environment():
     print("Tearing down testing environment")
 
 
-@pytest.fixture(scope="function")
-def db_setup():
+@pytest.fixture()
+def db_setup() -> Engine:
+    """Set up the database for testing."""
     print("Setting up test class & generating DB file")
     TestConfig.generate_temp_file()
     print(f"Setting up tests in DB {TestConfig.SQLALCHEMY_DATABASE_URI}")
     test_engine = DBSessionManager.get_engine()
-    TestSession = DBSessionManager.get_session_factory()
-    assert "tmp" in TestSession.kw.get("bind").url.database
+    test_session = DBSessionManager.get_session_factory()
+    assert "tmp" in test_session.kw.get("bind").url.database
     Base.metadata.create_all(bind=test_engine)
 
     yield test_engine  # This will return control to the test function, and pass the test_engine to it
@@ -44,19 +54,19 @@ def db_setup():
 
 
 # Session manager object to use in tests
-@pytest.fixture
-def db_session_manager(db_setup):
+@pytest.fixture()
+def db_session_manager(db_setup: Engine) -> DBSessionManager:
     """Create a session manager."""
     return DBSessionManager()
 
 
 # Session fixture to use in tests
-@pytest.fixture
-def shared_session(db_setup):
+@pytest.fixture()
+def shared_session(db_setup: Engine) -> Session:
     """Create a shared session."""
     test_engine = db_setup
-    Session = sessionmaker(bind=test_engine)
-    session = Session()
+    session_factory = sessionmaker(bind=test_engine)
+    session = session_factory()
 
     yield session
 
@@ -65,12 +75,12 @@ def shared_session(db_setup):
 
 
 # User fixture to use in tests
-@pytest.fixture
-def user_instance(shared_session):
+@pytest.fixture()
+def user_instance(shared_session: Session) -> User:
     """Create a user instance."""
     user = User(
         username="testuser",
-        password_hash="hashedpassword",  # Temporary hash - password is set below
+        password_hash="hashedpassword",  # noqa: S106 -  Temporary hash - password is set below
         email="test@example.com",
     )
     user.set_password("hashedpassword")
@@ -80,7 +90,7 @@ def user_instance(shared_session):
     user.city = "Test City"
     user.country = "Test Country"
     # Define a test date of birth as a datetime object
-    user.date_of_birth = datetime(1980, 1, 1)
+    user.date_of_birth = datetime(1980, 1, 1, tzinfo=TZ_INFO)
 
     shared_session.add(user)
     shared_session.commit()
@@ -88,8 +98,8 @@ def user_instance(shared_session):
 
 
 # Therapist fixture to use in tests
-@pytest.fixture
-def therapist_instance(shared_session, user_instance):
+@pytest.fixture()
+def therapist_instance(shared_session: Session, user_instance: User) -> Therapist:
     """Create a therapist instance."""
     therapist = Therapist(
         first_name="Test",
@@ -103,8 +113,10 @@ def therapist_instance(shared_session, user_instance):
     return therapist
 
 
-@pytest.fixture
-def therapy_session_instance(shared_session, user_instance, therapist_instance):
+@pytest.fixture()
+def therapy_session_instance(
+    shared_session: Session, user_instance: User, therapist_instance: Therapist
+) -> TherapySession:
     """Create a therapy session instance."""
     therapy_session = TherapySession(user=user_instance, therapist=therapist_instance)
     shared_session.add(therapy_session)
@@ -112,16 +124,21 @@ def therapy_session_instance(shared_session, user_instance, therapist_instance):
     return therapy_session
 
 
-@pytest.fixture
-def therapy_session_logic_instance(shared_session, therapy_session_instance):
+@pytest.fixture()
+def therapy_session_logic_instance(
+    shared_session: Session, therapy_session_instance: TherapySession
+) -> TherapySessionLogic:
     """Create a therapy session logic instance."""
     return TherapySessionLogic(pre_existing_session_id=therapy_session_instance.id)
 
 
-@pytest.fixture
+@pytest.fixture()
 def chat_instance(
-    shared_session, user_instance, therapist_instance, therapy_session_instance
-):
+    shared_session: Session,
+    user_instance: User,
+    therapist_instance: Therapist,
+    therapy_session_instance: TherapySession,
+) -> Chat:
     """Create a chat instance."""
     chat = Chat(
         user=user_instance,
@@ -135,11 +152,15 @@ def chat_instance(
     return chat
 
 
-@pytest.fixture
-def mocked_embedding_client(mocker):
+@pytest.fixture()
+def mocked_embedding_client(mocker: MockerFixture) -> MagicMock | NonCallableMagicMock | AsyncMock:
     """Mock the embedding client."""
-    EmbeddingResponse = namedtuple("EmbeddingResponse", ["data"])
-    EmbeddingData = namedtuple("EmbeddingData", ["embedding"])
+
+    class EmbeddingResponse(NamedTuple):
+        data: list[NamedTuple]
+
+    class EmbeddingData(NamedTuple):
+        embedding: list[float]
 
     # Create an instance of the EmbeddingData named tuple
     embedding_data = EmbeddingData(embedding=[0.1, 0.2, 0.3])
@@ -152,8 +173,8 @@ def mocked_embedding_client(mocker):
     return mocked_client
 
 
-@pytest.fixture
-def mocked_chat_completion(mocker):
+@pytest.fixture()
+def mocked_chat_completion(mocker: MockerFixture) -> MagicMock | NonCallableMagicMock | AsyncMock:
     """Mock the chat completion function."""
     # Mock the get_chat_completion function
     return mocker.patch(

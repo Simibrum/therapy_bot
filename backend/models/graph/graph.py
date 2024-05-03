@@ -7,7 +7,7 @@ from graphviz import Digraph
 from app.schemas.pydantic_nodes import NodeOut
 
 
-class Graph(object):
+class Graph:
     """Based on object here -
     https://www.python-course.eu/graphs_python.php.
 
@@ -19,7 +19,7 @@ class Graph(object):
     """
 
     def __init__(self, spacy_token=None):
-        """initializes a graph object
+        """Initializes a graph object
         If no dictionary or None is given,
         an empty dictionary will be used
         """
@@ -29,21 +29,18 @@ class Graph(object):
 
     @property
     def nodes(self):
-        """returns the nodes of a graph"""
+        """Returns the nodes of a graph"""
         return list(self.__graph_dict.keys())
 
     @property
     def edges(self):
-        """returns the edges of a graph"""
+        """Returns the edges of a graph"""
         return self.__generate_edges()
 
     @property
     def edge_indices(self):
-        """returns edges in terms of indices in nodes"""
-        return [
-            (self.nodes.index(node1), self.nodes.index(node2))
-            for node1, node2 in self.edges
-        ]
+        """Returns edges in terms of indices in nodes"""
+        return [(self.nodes.index(node1), self.nodes.index(node2)) for node1, node2 in self.edges]
 
     @property
     def node_labels(self):
@@ -81,7 +78,7 @@ class Graph(object):
                     return node
 
     def add_edge(self, edge):
-        """assumes that edge is of type set, tuple or list;
+        """Assumes that edge is of type set, tuple or list;
         between two nodes can be multiple edges!
         """
         (node1, node2) = tuple(edge)
@@ -125,10 +122,7 @@ class Graph(object):
         # Sort parent_node tokens
         parent_node.tokens.sort(key=lambda token: token.i)
         parent_node.label = " ".join(
-            [
-                "{0}_{1}_{2}_{3}".format(token.text, token.tag_, token.dep_, token.i)
-                for token in parent_node.tokens
-            ]
+            [f"{token.text}_{token.tag_}_{token.dep_}_{token.i}" for token in parent_node.tokens]
         )
         # Reconnect any dangling grandchildren
         grandchildren = self.__graph_dict[child_node]
@@ -161,20 +155,18 @@ class Graph(object):
         """Return a graph with just root tokens."""
         gv = Digraph()
         for node in self.nodes:
-            gv.node("{0}_{1}".format(node.root_token.text, node.root_token.i))
+            gv.node(f"{node.root_token.text}_{node.root_token.i}")
         for node1, node2 in self.edges:
             gv.edge(
-                "{0}_{1}".format(node1.root_token.text, node1.root_token.i),
-                "{0}_{1}".format(node2.root_token.text, node2.root_token.i),
+                f"{node1.root_token.text}_{node1.root_token.i}",
+                f"{node2.root_token.text}_{node2.root_token.i}",
             )
         return gv
 
     def build_graph(self, token):
         """Print a graph ."""
         # Add node to graph
-        node_name = "{0}_{1}_{2}_{3}".format(
-            token.text, token.tag_, token.dep_, token.i
-        )
+        node_name = f"{token.text}_{token.tag_}_{token.dep_}_{token.i}"
         self.add_node(node_name, token)
         for child in token.children:
             child_name = self.build_graph(child)
@@ -198,7 +190,6 @@ class Graph(object):
 
     def merge_single_children(self):
         """Merge nodes with single children."""
-
         nodes_to_pop = []
         nodes_to_merge = []
         # Does this need to run recursively?
@@ -215,10 +206,7 @@ class Graph(object):
         while nodes_to_merge:
             parent_node, child_node = nodes_to_merge.pop()
             updated_parent_node = self.merge_nodes(parent_node, child_node)
-            nodes_to_merge = [
-                (updated_parent_node, c) if p == child_node else (p, c)
-                for p, c in nodes_to_merge
-            ]
+            nodes_to_merge = [(updated_parent_node, c) if p == child_node else (p, c) for p, c in nodes_to_merge]
 
         # Remove merged nodes
         for ntp in nodes_to_pop:

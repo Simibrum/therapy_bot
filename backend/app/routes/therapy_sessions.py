@@ -3,7 +3,7 @@ from typing import Union
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from starlette.websockets import WebSocket, WebSocketState, WebSocketDisconnect
+from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
 
 from app.dependencies import manager
 from app.schemas.pydantic_therapy_sessions import TherapySessionListOut
@@ -23,9 +23,7 @@ def verify_token(token: str) -> Union[User, None]:
 
 
 @router.get("/sessions")
-def get_sessions(
-    session: Session = Depends(get_db), current_user: User = Depends(manager)
-) -> TherapySessionListOut:
+def get_sessions(session: Session = Depends(get_db), current_user: User = Depends(manager)) -> TherapySessionListOut:
     """Get all therapy sessions for the current user."""
     if not current_user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -70,9 +68,7 @@ async def websocket_endpoint(websocket: WebSocket, therapy_session_id: int):
 
         logger.info("Getting initial messages")
         # Get the therapy session - TODO needs to be async
-        therapy_session = TherapySessionLogic(
-            pre_existing_session_id=therapy_session_id
-        )
+        therapy_session = TherapySessionLogic(pre_existing_session_id=therapy_session_id)
         if not therapy_session:
             await websocket.send_text("No therapy session found")
             await websocket.close(code=status.WS_1008_POLICY_VIOLATION)

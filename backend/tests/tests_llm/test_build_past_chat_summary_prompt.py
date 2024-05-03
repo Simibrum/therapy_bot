@@ -19,37 +19,23 @@ class TestBuildPastChatSummaryPrompt:
     #  Handles a list with one chat message gracefully.
     def test_handles_one_chat_message(self):
         past_chats = ["Chat 1"]
-        expected_output = (
-            "System: Here is a summary of our past chats:\n\nChat 1\n\nUser: "
-        )
+        expected_output = "System: Here is a summary of our past chats:\n\nChat 1\n\nUser: "
         assert build_past_chat_summary_prompt(past_chats) == expected_output
 
     #  Handles a list with a very large number of chat messages gracefully.
     def test_handles_large_number_of_chat_messages(self):
         past_chats = ["Chat " + str(i) for i in range(100000)]
-        expected_output = (
-            "System: Here is a summary of our past chats:\n\n"
-            + "\n\n".join(past_chats)
-            + "\n\nUser: "
-        )
+        expected_output = "System: Here is a summary of our past chats:\n\n" + "\n\n".join(past_chats) + "\n\nUser: "
         assert build_past_chat_summary_prompt(past_chats) == expected_output
 
     #  Handles a list with very long chat messages gracefully.
     def test_handles_very_long_chat_messages(self):
         past_chats = ["a" * 100000, "b" * 100000, "c" * 100000]
-        expected_output = (
-            "System: Here is a summary of our past chats:\n\n"
-            + "\n\n".join(past_chats)
-            + "\n\nUser: "
-        )
+        expected_output = "System: Here is a summary of our past chats:\n\n" + "\n\n".join(past_chats) + "\n\nUser: "
         assert build_past_chat_summary_prompt(past_chats) == expected_output
 
     #  Handles a list with very short chat messages gracefully.
     def test_handles_very_short_chat_messages(self):
         past_chats = ["a", "b", "c"]
-        expected_output = (
-            "System: Here is a summary of our past chats:\n\n"
-            + "\n\n".join(past_chats)
-            + "\n\nUser: "
-        )
+        expected_output = "System: Here is a summary of our past chats:\n\n" + "\n\n".join(past_chats) + "\n\nUser: "
         assert build_past_chat_summary_prompt(past_chats) == expected_output

@@ -2,7 +2,7 @@
 
 
 from models.chats_mixin import HasChatReferences
-from models.common import PersonNameMixin, LifeDatesMixin
+from models.common import LifeDatesMixin, PersonNameMixin
 from models.knowledge.common import Common
 
 
