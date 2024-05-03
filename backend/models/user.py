@@ -5,12 +5,12 @@ from datetime import timedelta
 from enum import Enum as PyEnum
 
 import bcrypt
+from database import Base
 from sqlalchemy import Boolean, Enum, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from database import Base
-from models.common import LifeDatesMixin, LocationMixin, PersonNameMixin
 from utils.text_crypto import generate_encryption_key
+
+from models.common import LifeDatesMixin, LocationMixin, PersonNameMixin
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

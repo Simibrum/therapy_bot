@@ -3,9 +3,9 @@ from unittest.mock import patch
 
 import numpy as np
 import pytest
-
 from logic.therapy_session_logic import TherapySessionLogic
-from models.chats import Chat
+from models.chat import Chat
+
 from tests import custom_chat_completion as custom_create
 
 

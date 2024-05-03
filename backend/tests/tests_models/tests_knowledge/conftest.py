@@ -5,13 +5,14 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 import pytest
-
 from config import TZ_INFO
+from models.chat_reference import ChatReference
 from models.knowledge.event import Event
 from models.knowledge.person import Person
 from models.knowledge.place import Place
 
 if TYPE_CHECKING:
+    from models.chat import Chat
     from models.graph.node import Node
     from sqlalchemy.orm import Session
 
@@ -45,3 +46,14 @@ def place(shared_session: Session, multiple_nodes: list[Node]) -> Place:
     shared_session.add(place)
     shared_session.commit()
     return place
+
+
+@pytest.fixture()
+def nodes_with_chats(shared_session: Session, multiple_nodes: list[Node], chat_instance: Chat) -> list[Node]:
+    """Return nodes with chats."""
+    for node in multiple_nodes:
+        chat_reference = ChatReference(chat=chat_instance, node=node)
+        node.chats.append(chat_reference)
+        shared_session.add(node)
+    shared_session.commit()
+    return multiple_nodes

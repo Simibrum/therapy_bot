@@ -1,11 +1,12 @@
 """Module to define nodes in a graph model."""
 from __future__ import annotations
 
-from sqlalchemy import ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column
-
 from database import Base
+from sqlalchemy import ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from models.bytes_vector_mixin import BytesVectorMixin
+from models.chat_reference import ChatReference
 
 VALID_TYPES = [None, "type1", "type2", "type3"]
 
@@ -32,6 +33,9 @@ class Node(Base, BytesVectorMixin):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 
     type: Mapped[str] = mapped_column(String(255), nullable=True)
+
+    # Relationships
+    chats: Mapped[list[ChatReference]] = relationship(back_populates="node")
 
     def __init__(self, label: str, user_id: int, node_type: str | None = None) -> None:
         """Initialise a node."""

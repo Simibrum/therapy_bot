@@ -6,13 +6,12 @@ from datetime import datetime
 from typing import TYPE_CHECKING, NamedTuple
 
 import pytest
-from sqlalchemy.orm import Session, sessionmaker
-
 from config import TZ_INFO, TestConfig
 from database import Base
 from database.db_engine import DBSessionManager
 from logic.therapy_session_logic import TherapySessionLogic
 from models import Chat, Therapist, TherapySession, User
+from sqlalchemy.orm import Session, sessionmaker
 
 if TYPE_CHECKING:
     from unittest.mock import AsyncMock, MagicMock, NonCallableMagicMock
@@ -57,6 +56,7 @@ def db_setup() -> Engine:
 @pytest.fixture()
 def db_session_manager(db_setup: Engine) -> DBSessionManager:
     """Create a session manager."""
+    assert db_setup  # Ensure the db_setup fixture is called to initialize the database
     return DBSessionManager()
 
 
@@ -125,9 +125,7 @@ def therapy_session_instance(
 
 
 @pytest.fixture()
-def therapy_session_logic_instance(
-    shared_session: Session, therapy_session_instance: TherapySession
-) -> TherapySessionLogic:
+def therapy_session_logic_instance(therapy_session_instance: TherapySession) -> TherapySessionLogic:
     """Create a therapy session logic instance."""
     return TherapySessionLogic(pre_existing_session_id=therapy_session_instance.id)
 

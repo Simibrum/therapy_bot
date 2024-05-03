@@ -1,8 +1,8 @@
 """Initialise the models package."""
-from models.chats import Chat
-from models.therapists import Therapist
+from models.chat import Chat
+from models.therapist import Therapist
 from models.therapy_session import TherapySession
-from models.users import RoleEnum, User
+from models.user import RoleEnum, User
 
 __all__ = [
     "User",

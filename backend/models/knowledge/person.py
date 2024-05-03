@@ -1,12 +1,10 @@
 """Model to define a person in the knowledge graph."""
 
-
-from models.chats_mixin import HasChatReferences
 from models.common import LifeDatesMixin, PersonNameMixin
 from models.knowledge.common import Common
 
 
-class Person(Common, PersonNameMixin, LifeDatesMixin, HasChatReferences):
+class Person(Common, PersonNameMixin, LifeDatesMixin):
     """Model to define a person in the knowledge graph."""
 
     __tablename__ = "persons"

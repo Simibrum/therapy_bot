@@ -1,13 +1,18 @@
 """Fixtures for models tests."""
 from __future__ import annotations
 
-import pytest
+from typing import TYPE_CHECKING
 
+import pytest
 from models.graph.node import Node
+
+if TYPE_CHECKING:
+    from models.user import User
+    from sqlalchemy.orm import Session
 
 
 @pytest.fixture()
-def multiple_nodes(shared_session, user_instance) -> list[Node]:
+def multiple_nodes(shared_session: Session, user_instance: User) -> list[Node]:
     """Return multiple nodes."""
     nodes = []
     for i in range(10):

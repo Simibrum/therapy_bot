@@ -2,12 +2,15 @@
 from unittest.mock import patch
 
 import numpy as np
+from pytest_mock import MockerFixture
+from sqlalchemy import Engine
+
+from models import Chat, User, Therapist
 from sqlalchemy.orm import sessionmaker
 
-from models import Chat
 
-
-def test_chat_model(db_setup, user_instance, therapist_instance, chat_instance):
+def test_chat_model(db_setup, user_instance, therapist_instance, chat_instance) -> None:
+    """Test the chat model."""
     test_engine = db_setup
     Session = sessionmaker(bind=test_engine)
     session = Session()
@@ -31,11 +34,16 @@ def test_chat_model(db_setup, user_instance, therapist_instance, chat_instance):
     session.close()
 
 
-@patch("models.chats.get_embedding", return_value=np.array([0.1, 0.2, 0.3]))
-def test_fetch_text_vector(mock_get_embedding, db_setup, user_instance, therapist_instance, chat_instance):
+@patch("models.chat.get_embedding", return_value=np.array([0.1, 0.2, 0.3]))
+def test_fetch_text_vector(
+    mock_get_embedding: MockerFixture, db_setup: Engine, user_instance: User,
+    therapist_instance: Therapist, chat_instance: Chat
+) -> None:
+    """Test fetching the text vector."""
+    assert therapist_instance
     test_engine = db_setup
-    Session = sessionmaker(bind=test_engine)
-    session = Session()
+    session_factory = sessionmaker(bind=test_engine)
+    session = session_factory()
 
     # Retrieve the chat from the database
     retrieved_chat = session.query(Chat).filter_by(id=chat_instance.id).one()

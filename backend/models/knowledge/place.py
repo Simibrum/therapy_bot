@@ -4,12 +4,13 @@
 from sqlalchemy import Numeric
 from sqlalchemy.orm import Mapped, mapped_column
 
-from models.chats_mixin import HasChatReferences
 from models.common import LocationMixin
 from models.knowledge.common import Common
 
 
-class Place(Common, LocationMixin, HasChatReferences):
+class Place(Common, LocationMixin):
+    """Model to define a place in the knowledge graph."""
+
     __tablename__ = "places"
 
     # Place-specific fields

@@ -2,60 +2,27 @@
 import datetime
 
 import numpy as np
-from sqlalchemy import DateTime, ForeignKey, Integer, String, func
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-
 from config import logger
 from database import Base
 from llm.embeddings import get_embedding
-from models.bytes_vector_mixin import BytesVectorMixin
+from sqlalchemy import DateTime, ForeignKey, Integer, String, func
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from utils.text_crypto import decrypt_string, encrypt_string
 
-
-class ChatReferenceAssociation(Base):
-    """Associates a chat reference with a particular entity.
-
-    Based on here
-    - https://docs.sqlalchemy.org/en/20/_modules/examples/generic_associations/discriminator_on_association.html
-    """
-
-    __tablename__ = "chat_reference_association"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-
-    discriminator: Mapped[str] = mapped_column(String(255))
-
-    __mapper_args__ = {"polymorphic_on": discriminator}
-
-
-class ChatReference(Base):
-    """Reference to a particular location within a chat."""
-
-    __tablename__ = "chat_references"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    chat_id: Mapped[int] = mapped_column(ForeignKey("chats.id"), nullable=False)
-
-    character_idx_start: Mapped[int] = mapped_column(Integer, nullable=False)
-    character_idx_end: Mapped[int] = mapped_column(Integer, nullable=False)
-
-    span_idx_start: Mapped[int] = mapped_column(Integer, nullable=False)
-    span_idx_end: Mapped[int] = mapped_column(Integer, nullable=False)
-
-    sentence_idx: Mapped[int] = mapped_column(Integer, nullable=False)
-    doc_index: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-
-    association_id: Mapped[int] = mapped_column(Integer, ForeignKey("chat_reference_association.id"))
-    association = relationship("ChatReferenceAssociation", backref="chat_references")
-    parent = association_proxy("association", "parent")
+from models.bytes_vector_mixin import BytesVectorMixin
 
 
 class Chat(Base, BytesVectorMixin):
+    """Class model for chats between a user and a therapist."""
+
     __tablename__ = "chats"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    # Links to other tables
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     therapist_id: Mapped[int] = mapped_column(ForeignKey("therapists.id"), nullable=False)
     therapy_session_id: Mapped[int] = mapped_column(ForeignKey("therapy_sessions.id"), nullable=False)
+    # Fields
     timestamp: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, default=func.now())
     # Sender is "user" or "therapist"
     sender: Mapped[str] = mapped_column(String(10), nullable=False)
@@ -67,6 +34,7 @@ class Chat(Base, BytesVectorMixin):
     user = relationship("User", back_populates="chats")
     therapist = relationship("Therapist", back_populates="chats")
     therapy_session = relationship("TherapySession", back_populates="chats")
+    nodes = relationship("ChatReference", back_populates="chat")
 
     @hybrid_property
     def text(self) -> str:
@@ -79,8 +47,7 @@ class Chat(Base, BytesVectorMixin):
 
         """
         if self._encrypted_text:
-            plaintext = decrypt_string(self.user.encryption_key.encode(), self._encrypted_text)
-            return plaintext
+            return decrypt_string(self.user.encryption_key.encode(), self._encrypted_text)
         return ""
 
     @text.setter
