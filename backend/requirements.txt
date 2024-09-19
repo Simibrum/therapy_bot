@@ -28,6 +28,9 @@ requests
 # Code formatting
 black
 
+# nlp
+spacy
+
 # QA / Agent functionality
 langchain
 openai>=1.2.0

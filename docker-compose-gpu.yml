@@ -6,12 +6,14 @@ services:
     image: therapy_bot_backend_gpu:latest
     build:
       context: ./backend
-      dockerfile: Dockerfile_gpu
+      dockerfile: Dockerfile_gpu_prod
+    command: [ "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000" ]
     environment:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       DEBUG_MODE: "False"
       CONFIG_ENV: "production"
       FRONTEND_URL: ${FRONTEND_URL}
+      SPACY_MODEL: "en_core_web_trf"
     ports:
       - "8000:80"
     deploy:

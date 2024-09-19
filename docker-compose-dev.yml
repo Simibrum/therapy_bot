@@ -3,12 +3,15 @@ version: "3.8"
 services:
   backend:
     image: therapy_bot_backend:latest
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile_dev
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     environment:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       DEBUG_MODE: "True"
       CONFIG_ENV: "development"
+      USE_GPU: "False"
     ports:
       - "8000:8000"
     volumes:

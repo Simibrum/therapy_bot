@@ -5,12 +5,14 @@ services:
     image: therapy_bot_backend_gpu:latest
     build:
       context: ./backend
-      dockerfile: Dockerfile_gpu
+      dockerfile: Dockerfile_gpu_dev
     command: [ "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload" ]
     environment:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       DEBUG_MODE: "True"
       CONFIG_ENV: "development"
+      USE_GPU: "True"
+      SPACY_MODEL: "en_core_web_trf"
     ports:
       - "8000:8000"
     volumes:

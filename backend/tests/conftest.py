@@ -11,12 +11,14 @@ from database import Base
 from database.db_engine import DBSessionManager
 from logic.therapy_session_logic import TherapySessionLogic
 from models import Chat, Therapist, TherapySession, User
+from spacy_nlp import NLPService
 from sqlalchemy.orm import Session, sessionmaker
 
 if TYPE_CHECKING:
     from unittest.mock import AsyncMock, MagicMock, NonCallableMagicMock
 
     from pytest_mock import MockerFixture
+    from spacy import Language
     from sqlalchemy.engine import Engine
 
 
@@ -179,3 +181,9 @@ def mocked_chat_completion(mocker: MockerFixture) -> MagicMock | NonCallableMagi
         "logic.therapy_session_logic.get_chat_completion",
         return_value="Welcome to your therapy session!",
     )
+
+
+@pytest.fixture(scope="session")
+def test_nlp() -> Language:
+    """Create a test spaCy NLP object."""
+    return NLPService().get_nlp()

@@ -1,4 +1,4 @@
-# Dockerfile for the frontend
+# Dockerfile_dev for the frontend
 # Use an official Node runtime as the base image
 FROM node AS build
 

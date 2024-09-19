@@ -1,6 +1,7 @@
 """Configuration for the backend."""
 import os
 import tempfile
+
 from zoneinfo import ZoneInfo
 
 from config.helper_functions import load_from_env_file
@@ -25,6 +26,12 @@ REFRESH_TOKEN_EXPIRE_DAYS = 7
 # Set Timezone
 TIMEZONE = os.getenv("TIMEZONE", "UTC")
 TZ_INFO = ZoneInfo(TIMEZONE)
+
+# GPU settings
+USE_GPU = os.getenv("USE_GPU", "False").lower() == "true"
+
+# SPACY Model
+SPACY_MODEL = os.getenv("SPACY_MODEL", "en_core_web_sm")
 
 
 class ProductionConfig:
@@ -86,10 +93,11 @@ class TestConfig:
 
     @staticmethod
     def remove_temp_file():
+        """Remove the temporary database file."""
         os.remove(TestConfig.DATABASE_FILE)
 
 
-def get_config():
+def get_config() -> object:
     """Set the working environment."""
     logger.debug("Getting config")
     # Config to use

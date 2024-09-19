@@ -9,6 +9,7 @@ from models.chat_reference import ChatReference
 if TYPE_CHECKING:
     from models.graph.node import Node
     from models.knowledge.event import Event
+    from sqlalchemy.orm import Session
 
 
 class TestEvent:
@@ -23,7 +24,7 @@ class TestEvent:
         assert event.date is not None
         assert isinstance(event.date, datetime)
 
-    def test_event_relationships(self, event: Event, nodes_with_chats: list[Node]) -> None:
+    def test_event_relationships(self, event: Event, nodes_with_chats: list[Node], shared_session: Session) -> None:
         """Test the event relationships."""
         assert nodes_with_chats is not None
         # Check whether the event node has a chat

@@ -1,14 +1,18 @@
 """Module to define nodes in a graph model."""
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from database import Base
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models.bytes_vector_mixin import BytesVectorMixin
-from models.chat_reference import ChatReference
 
-VALID_TYPES = [None, "type1", "type2", "type3"]
+if TYPE_CHECKING:
+    from models.chat_reference import ChatReference
+
+VALID_TYPES = [None, "event", "person", "place", "object"]
 
 
 def sanitize_input(input_str: str) -> str:

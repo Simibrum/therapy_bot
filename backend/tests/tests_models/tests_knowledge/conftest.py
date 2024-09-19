@@ -51,8 +51,10 @@ def place(shared_session: Session, multiple_nodes: list[Node]) -> Place:
 @pytest.fixture()
 def nodes_with_chats(shared_session: Session, multiple_nodes: list[Node], chat_instance: Chat) -> list[Node]:
     """Return nodes with chats."""
+    shared_session.add(chat_instance)
     for node in multiple_nodes:
         chat_reference = ChatReference(chat=chat_instance, node=node)
+        shared_session.add(chat_reference)
         node.chats.append(chat_reference)
         shared_session.add(node)
     shared_session.commit()

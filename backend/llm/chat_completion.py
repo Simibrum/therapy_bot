@@ -1,4 +1,6 @@
 """Functions to handle chat completion."""
+from __future__ import annotations
+
 from llm.common import api_request
 
 
@@ -19,5 +21,4 @@ def get_chat_completion(
 
     messages.append({"role": "user", "content": next_message_prompt})
 
-    response = api_request(messages=messages, model=model, temperature=temperature)
-    return response
+    return api_request(messages=messages, model=model, temperature=temperature)

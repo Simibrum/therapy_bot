@@ -49,3 +49,13 @@ class LifeDatesMixin:
             )
             return age
         return -1
+
+
+class ObjectMixin:
+    """Contains object data for a user."""
+
+    name: Mapped[str] = mapped_column(String(255), nullable=True)
+    type: Mapped[str] = mapped_column(String(255), nullable=True)
+    description: Mapped[str] = mapped_column(String(255), nullable=True)
+    # This can be a barcode or QR code or something else
+    code: Mapped[str] = mapped_column(String(255), nullable=True)

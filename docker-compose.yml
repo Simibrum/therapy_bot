@@ -4,7 +4,9 @@ version: "3.8"
 services:
   backend:
     image: therapy_bot_backend:latest
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile_prod
     environment:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       DEBUG_MODE: "False"
