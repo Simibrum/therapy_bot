@@ -4,6 +4,7 @@ from datetime import datetime
 
 from sqlalchemy import DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
+from zoneinfo import ZoneInfo
 
 
 class LocationMixin:
@@ -41,13 +42,12 @@ class LifeDatesMixin:
 
         """
         if self.date_of_birth:
-            today = datetime.today()
-            age = (
+            today = datetime.now(tz=ZoneInfo("UTC"))
+            return (
                 today.year
                 - self.date_of_birth.year
                 - ((today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day))
-            )
-            return age
+            )  # Return the age in years
         return -1
 
 
@@ -59,3 +59,14 @@ class ObjectMixin:
     description: Mapped[str] = mapped_column(String(255), nullable=True)
     # This can be a barcode or QR code or something else
     code: Mapped[str] = mapped_column(String(255), nullable=True)
+
+
+class OrganisationMixin:
+    """Contains organization-specific data."""
+
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    type: Mapped[str] = mapped_column(String(255), nullable=True)  # e.g., "Corporation", "Non-profit", "Government"
+    industry: Mapped[str] = mapped_column(String(255), nullable=True)
+    founded_date: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    website: Mapped[str] = mapped_column(String(255), nullable=True)
+    description: Mapped[str] = mapped_column(String(1000), nullable=True)

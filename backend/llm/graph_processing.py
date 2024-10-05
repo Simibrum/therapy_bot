@@ -2,13 +2,14 @@
 from __future__ import annotations
 
 import json
-
 from typing import TYPE_CHECKING
 
 from config import logger
 
 if TYPE_CHECKING:
     from spacy.tokens import Doc
+
+from models.knowledge import VALID_TYPES
 
 from llm.common import api_request
 
@@ -34,6 +35,26 @@ GRAPH_PROCESSOR_SYSTEM_PROMPT = (
     "* Make sure the target and source of edges match an existing node.\n"
     "* Do not include the markdown triple quotes above and below the JSON, jump straight into it "
     "with a curly bracket.\n"
+)
+
+TYPE_STRING = ", ".join([f'"{TYPE}"' for TYPE in VALID_TYPES])
+
+GP_NODE_JSON_PROMPT = (
+    "Here an example of the JSON format for the nodes in the knowledge graph.\n"
+    "{\n"
+    '  "nodes": [\n'
+    "    {\n"
+    '      "label": "Apple",\n'
+    '      "spans": [[0, 1]],\n'
+    f'      "type": one of {TYPE_STRING},\n'
+    "    },\n"
+    "    {\n"
+    '      "label": "Steve Jobs",\n'
+    '      "spans": [[2, 3]],\n'
+    f'      "type": one of {TYPE_STRING},\n'
+    "    }\n"
+    "  ]\n"
+    "}"
 )
 
 GP_NODE_PROMPT = (
@@ -64,7 +85,7 @@ def get_nodes(doc: Doc) -> list[dict]:
 
     messages = [
         {"role": "system", "content": GRAPH_PROCESSOR_SYSTEM_PROMPT},
-        {"role": "user", "content": GP_NODE_PROMPT.format(text, tokens_and_indexes)},
+        {"role": "user", "content": GP_NODE_JSON_PROMPT + "\n\n" + GP_NODE_PROMPT.format(text, tokens_and_indexes)},
     ]
 
     response = api_request(messages=messages, model=MODEL, temperature=0.1)

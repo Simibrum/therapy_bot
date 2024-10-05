@@ -16,3 +16,7 @@ lint.ignore = [
     "ANN101", # Missing type annotation for self in method
 ]
 line-length = 120
+
+[tool.ruff.lint.per-file-ignores]
+# Ignore docstrings and type annotations in tests
+"**/tests/*" = ["D101", "D102", "ANN201"]

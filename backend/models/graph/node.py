@@ -8,11 +8,10 @@ from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models.bytes_vector_mixin import BytesVectorMixin
+from models.knowledge import VALID_TYPES
 
 if TYPE_CHECKING:
     from models.chat_reference import ChatReference
-
-VALID_TYPES = [None, "event", "person", "place", "object"]
 
 
 def sanitize_input(input_str: str) -> str:

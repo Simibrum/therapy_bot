@@ -8,6 +8,8 @@ import pytest
 from config import TZ_INFO
 from models.chat_reference import ChatReference
 from models.knowledge.event import Event
+from models.knowledge.object import Object
+from models.knowledge.organisation import Organisation
 from models.knowledge.person import Person
 from models.knowledge.place import Place
 
@@ -46,6 +48,28 @@ def place(shared_session: Session, multiple_nodes: list[Node]) -> Place:
     shared_session.add(place)
     shared_session.commit()
     return place
+
+
+@pytest.fixture()
+def organisation(shared_session: Session, multiple_nodes: list[Node]) -> Organisation:
+    """Return an organisation."""
+    organisation = Organisation(
+        node_id=multiple_nodes[0].id,
+        user_id=multiple_nodes[0].user_id,
+        name="Cyberdyne Systems",
+    )
+    shared_session.add(organisation)
+    shared_session.commit()
+    return organisation
+
+
+@pytest.fixture()
+def kg_object(shared_session: Session, multiple_nodes: list[Node]) -> Object:
+    """Return an object."""
+    object_instance = Object(node_id=multiple_nodes[0].id, user_id=multiple_nodes[0].user_id)
+    shared_session.add(object_instance)
+    shared_session.commit()
+    return object_instance
 
 
 @pytest.fixture()

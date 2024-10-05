@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Remote Python 3.10.13 Docker Compose (backend) (2)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Therapy Bot - Docker Backend" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.10 (therapy_bot)" project-jdk-type="Python SDK" />
 </project>
