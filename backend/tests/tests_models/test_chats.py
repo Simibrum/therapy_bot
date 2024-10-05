@@ -8,9 +8,11 @@ from sqlalchemy import Engine
 from sqlalchemy.orm import sessionmaker
 
 
-def test_chat_model(db_setup: Engine, user_instance: User, therapist_instance: Therapist, chat_instance: Chat) -> None:
+def test_chat_model(
+    sync_db_setup: Engine, user_instance: User, therapist_instance: Therapist, chat_instance: Chat
+) -> None:
     """Test the chat model."""
-    test_engine = db_setup
+    test_engine = sync_db_setup
     session_factory = sessionmaker(bind=test_engine)
     session = session_factory()
 
@@ -36,14 +38,14 @@ def test_chat_model(db_setup: Engine, user_instance: User, therapist_instance: T
 @patch("models.chat.get_embedding", return_value=np.array([0.1, 0.2, 0.3]))
 def test_fetch_text_vector(
     mock_get_embedding: MockerFixture,
-    db_setup: Engine,
+    sync_db_setup: Engine,
     user_instance: User,
     therapist_instance: Therapist,
     chat_instance: Chat,
 ) -> None:
     """Test fetching the text vector."""
     assert therapist_instance
-    test_engine = db_setup
+    test_engine = sync_db_setup
     session_factory = sessionmaker(bind=test_engine)
     session = session_factory()
 

@@ -1,13 +1,12 @@
 """Tests for the users models."""
+from models import RoleEnum, User
 from sqlalchemy.orm import sessionmaker
 
-from models import RoleEnum, User
 
-
-def test_user(db_setup, user_instance):
-    test_engine = db_setup
-    Session = sessionmaker(bind=test_engine)
-    session = Session()
+def test_user(sync_db_setup, user_instance):
+    test_engine = sync_db_setup
+    sessionmaker_instance = sessionmaker(bind=test_engine)
+    session = sessionmaker_instance()
 
     # Retrieve the user from the database
     retrieved_user = session.query(User).filter_by(id=user_instance.id).one()

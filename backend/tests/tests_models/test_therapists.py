@@ -1,13 +1,12 @@
 """Tests for the therapists models."""
+from models import Therapist
 from sqlalchemy.orm import sessionmaker
 
-from models import Therapist
 
-
-def test_therapist(db_setup, user_instance, therapist_instance):
+def test_therapist(sync_db_setup, user_instance, therapist_instance):
     """Test the therapist model."""
     # db_setup fixture is automatically injected by pytest
-    test_engine = db_setup
+    test_engine = sync_db_setup
     # Create a new SQLAlchemy session
     Session = sessionmaker(bind=test_engine)
     session = Session()

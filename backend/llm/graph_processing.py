@@ -45,12 +45,12 @@ GP_NODE_JSON_PROMPT = (
     '  "nodes": [\n'
     "    {\n"
     '      "label": "Apple",\n'
-    '      "spans": [[0, 1]],\n'
+    '      "spans": [[0]],\n'
     f'      "type": one of {TYPE_STRING},\n'
     "    },\n"
     "    {\n"
     '      "label": "Steve Jobs",\n'
-    '      "spans": [[2, 3]],\n'
+    '      "spans": [[4, 5]],\n'
     f'      "type": one of {TYPE_STRING},\n'
     "    }\n"
     "  ]\n"
@@ -59,15 +59,29 @@ GP_NODE_JSON_PROMPT = (
 
 GP_NODE_PROMPT = (
     "Please provide the nodes for the knowledge graph based on the following input text.\n"
-    "Remember to include the label and spans parameters for each node.\n\n"
+    "\n"
     "Input Text: \n"
     "{}\n\n"
     "Token Indexes: {}"
 )
 
+GP_EDGE_JSON_PROMPT = (
+    "Here an example of the JSON format for the edges in the knowledge graph.\n"
+    "{\n"
+    '  "edges": [\n'
+    "    {\n"
+    '      "label": "was run by",\n'
+    '      "source": 1,\n'
+    '      "target": 2,\n'
+    '      "spans": [[1, 3]],\n'
+    "    }\n"
+    "  ]\n"
+    "}"
+)
+
 GP_EDGE_PROMPT = (
     "Please provide the edges for the knowledge graph based on the following input text.\n"
-    "Remember to include the label and spans parameters for each edge.\n\n"
+    "\n"
     "Input Text: \n"
     "{}\n\n"
     "Token Indexes: {}"
@@ -81,7 +95,7 @@ GP_EXISTING_NODES_PROMPT = (
 def get_nodes(doc: Doc) -> list[dict]:
     """Generate candidate nodes from the input text."""
     text = doc.text
-    tokens_and_indexes = [(token.text, token.idx) for token in doc]
+    tokens_and_indexes = [(token.text, token.i) for token in doc]
 
     messages = [
         {"role": "system", "content": GRAPH_PROCESSOR_SYSTEM_PROMPT},
@@ -106,10 +120,11 @@ def get_nodes(doc: Doc) -> list[dict]:
 def get_edges(doc: Doc, existing_nodes: list[dict]) -> list[dict]:
     """Generate candidate edges from the input text."""
     text = doc.text
-    tokens_and_indexes = [(token.text, token.idx) for token in doc]
+    tokens_and_indexes = [(token.text, token.i) for token in doc]
 
     messages = [
         {"role": "system", "content": GRAPH_PROCESSOR_SYSTEM_PROMPT},
+        {"role": "user", "content": GP_EDGE_JSON_PROMPT},
         {"role": "user", "content": GP_EDGE_PROMPT.format(text, tokens_and_indexes)},
         {"role": "user", "content": GP_EXISTING_NODES_PROMPT.format(existing_nodes)},
     ]

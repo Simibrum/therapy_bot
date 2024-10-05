@@ -104,6 +104,19 @@ class DBSessionManager:
             logger.info(f"Initializing asynchronous database - created engine instance - {cls._async_engine.url}")
         return cls._async_engine
 
+    @classmethod
+    def reset(cls):
+        """Reset all engine and session instances."""
+        if cls._sync_engine:
+            cls._sync_engine.dispose()
+            cls._sync_engine = None
+        if cls._async_engine:
+            cls._async_engine.dispose()
+            cls._async_engine = None
+        cls._SyncSession = None
+        cls._AsyncSession = None
+        logger.info("Reset all database engines and sessions")
+
 
 # Synchronous database session generator
 def get_db() -> Session:
