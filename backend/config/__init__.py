@@ -1,6 +1,8 @@
 """Configuration for the backend."""
 import os
 import tempfile
+from pathlib import Path
+from typing import ClassVar
 
 from zoneinfo import ZoneInfo
 
@@ -40,13 +42,9 @@ class ProductionConfig:
     name = "production"
     # Database setup
     # Use an SQLite database for now - in database folder that is sibling of parent config folder
-    DATABASE_FILE = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-        "database",
-        "database.db",
-    )
-    SQLALCHEMY_DATABASE_URI = f"sqlite:///{DATABASE_FILE}"
-    SQLALCHEMY_ENGINE_OPTIONS = {"connect_args": {"check_same_thread": False}}
+    DATABASE_FILE: ClassVar[Path] = Path(__file__).parent.parent / "database" / "database.db"
+    SQLALCHEMY_DATABASE_URI: ClassVar[str] = f"sqlite:///{DATABASE_FILE}"
+    SQLALCHEMY_ENGINE_OPTIONS: ClassVar[dict] = {"connect_args": {"check_same_thread": False}}
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TESTING = False
     DEBUG = False
@@ -58,13 +56,9 @@ class DevelopmentConfig:
 
     name = "development"
     # Use an SQLite database for now - in database folder that is sibling of parent config folder
-    DATABASE_FILE = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-        "database",
-        "dev_database.db",
-    )
-    SQLALCHEMY_DATABASE_URI = f"sqlite:///{DATABASE_FILE}"
-    SQLALCHEMY_ENGINE_OPTIONS = {"connect_args": {"check_same_thread": False}}
+    DATABASE_FILE: ClassVar[Path] = Path(__file__).parent.parent / "database" / "dev_database.db"
+    SQLALCHEMY_DATABASE_URI: ClassVar[str] = f"sqlite:///{DATABASE_FILE}"
+    SQLALCHEMY_ENGINE_OPTIONS: ClassVar[dict] = {"connect_args": {"check_same_thread": False}}
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TESTING = False
     DEBUG = True
@@ -76,25 +70,66 @@ class TestConfig:
 
     name = "local_test"
     # Switch to temporary file-based DB to avoid issues with DB data being reset between tests
-    DATABASE_FILE = None
-    SQLALCHEMY_DATABASE_URI = None
-    # SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
-    SQLALCHEMY_ENGINE_OPTIONS = {"connect_args": {"check_same_thread": False}}
+    DATABASE_FILE: ClassVar[Path] = None
+    SQLALCHEMY_DATABASE_URI: ClassVar[str] = None
+    SQLALCHEMY_ENGINE_OPTIONS: ClassVar[dict] = {"connect_args": {"check_same_thread": False}}
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TESTING = True
     BCRYPT_LOG_ROUNDS = 4  # Use a low value for faster tests; the default is 12
     DEBUG = True
 
     @classmethod
-    def generate_temp_file(cls):
+    def generate_temp_file(cls) -> None:
         """Generate a temporary database file and update the configuration."""
-        cls.DATABASE_FILE = tempfile.mkstemp()[1]
+        cls.DATABASE_FILE = Path(tempfile.mkstemp()[1])
         cls.SQLALCHEMY_DATABASE_URI = f"sqlite:///{cls.DATABASE_FILE}"
 
     @staticmethod
-    def remove_temp_file():
+    def remove_temp_file() -> None:
         """Remove the temporary database file."""
-        os.remove(TestConfig.DATABASE_FILE)
+        TestConfig.DATABASE_FILE.unlink()
+
+
+class AsyncConfig:
+    """Asynchronous configuration - for async database operations."""
+
+    name = "async"
+
+    # Determine which async database to use
+    ASYNC_DB_TYPE = os.getenv("ASYNC_DB_TYPE", "sqlite").lower()
+
+    if ASYNC_DB_TYPE == "postgres":
+        # PostgreSQL configuration
+        DB_USER = os.getenv("POSTGRES_USER", "user")
+        DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "password")
+        DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
+        DB_PORT = os.getenv("POSTGRES_PORT", "5432")
+        DB_NAME = os.getenv("POSTGRES_DB", "asyncdb")
+        SQLALCHEMY_DATABASE_URI: ClassVar[
+            str
+        ] = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    else:
+        # SQLite configuration (default)
+        DB_FILE = os.getenv("SQLITE_DB_FILE", "async_sqlite.db")
+        DB_PATH = Path(__file__).parent.parent / "database" / DB_FILE
+        SQLALCHEMY_DATABASE_URI: ClassVar[str] = f"sqlite+aiosqlite:///{DB_PATH}"
+
+    SQLALCHEMY_ENGINE_OPTIONS: ClassVar[dict] = {
+        "echo": True,  # Set to False in production
+        "pool_pre_ping": True,
+    }
+    if ASYNC_DB_TYPE == "postgres":
+        SQLALCHEMY_ENGINE_OPTIONS.update(
+            {
+                "pool_size": 5,
+                "max_overflow": 10,
+            }
+        )
+
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    TESTING = False
+    DEBUG = True  # Set to False in production
+    BCRYPT_LOG_ROUNDS = 12
 
 
 def get_config() -> object:
@@ -112,6 +147,9 @@ def get_config() -> object:
     elif config_env == "testing":
         logger.debug("Using test config")
         config = TestConfig
+    elif config_env == "async":
+        logger.debug(f"Using async config with {AsyncConfig.ASYNC_DB_TYPE}")
+        config = AsyncConfig
     else:
         logger.debug("Using testing config as default")
         config = TestConfig

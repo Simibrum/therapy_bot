@@ -2,9 +2,9 @@
 
 from datetime import datetime
 
+from config import TZ_INFO
 from sqlalchemy import DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
-from zoneinfo import ZoneInfo
 
 
 class LocationMixin:
@@ -42,7 +42,7 @@ class LifeDatesMixin:
 
         """
         if self.date_of_birth:
-            today = datetime.now(tz=ZoneInfo("UTC"))
+            today = datetime.now(tz=TZ_INFO)
             return (
                 today.year
                 - self.date_of_birth.year
