@@ -1,10 +1,12 @@
 """Test schema objects."""
-import pytest
 import datetime
-from app.schemas.pydantic_chats import ChatOut, ChatListOut
+
+import pytest
+
+from app.schemas.pydantic_chats import ChatListOut, ChatOut
 
 
-@pytest.fixture
+@pytest.fixture()
 def chat_out_instance():
     """Fixture to create a ChatOut instance."""
     return ChatOut(
@@ -14,11 +16,11 @@ def chat_out_instance():
         therapist_id=None,
         text="Hello!",
         sender="user",
-        timestamp=datetime.datetime(2023, 11, 3, 10, 0, 0)
+        timestamp=datetime.datetime(2023, 11, 3, 10, 0, 0),
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def chat_list_out_instance(chat_out_instance):
     """Fixture to create a ChatListOut instance."""
     return ChatListOut(messages=[chat_out_instance, chat_out_instance])

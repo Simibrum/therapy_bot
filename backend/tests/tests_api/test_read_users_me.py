@@ -2,7 +2,6 @@
 
 
 class TestReadUsersMe:
-
     #  Return details of the current user.
 
     def test_return_details_of_current_user(self, authenticated_test_client, user_instance):
@@ -18,7 +17,7 @@ class TestReadUsersMe:
             "address": user_instance.address,
             "city": user_instance.city,
             "country": user_instance.country,
-            "age": user_instance.age
+            "age": user_instance.age,
         }
 
     def test_user_is_authenticated(self, authenticated_test_client):

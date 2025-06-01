@@ -1,16 +1,16 @@
 """Routes for Therapy Sessions."""
 from typing import Union
 
+from config import logger
+from database import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
+from logic.therapy_session_logic import TherapySessionLogic
+from models import Chat, ChatReference, Node, TherapySession, User
 from sqlalchemy.orm import Session
-from starlette.websockets import WebSocket, WebSocketState, WebSocketDisconnect
+from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
 
 from app.dependencies import manager
 from app.schemas.pydantic_therapy_sessions import TherapySessionListOut
-from config import logger
-from database import get_db
-from logic.therapy_session_logic import TherapySessionLogic
-from models import User
 
 router = APIRouter()
 
@@ -43,11 +43,35 @@ def new_session(current_user: User = Depends(manager)):
     return {"session_id": new_therapy_session.therapy_session_id}
 
 
+@router.get("/sessions/{session_id}/entities")
+def get_session_entities(session_id: int, session: Session = Depends(get_db), current_user: User = Depends(manager)):
+    """Get extracted entities for a therapy session."""
+    # Verify session belongs to user
+    therapy_session = (
+        session.query(TherapySession)
+        .filter(TherapySession.id == session_id, TherapySession.user_id == current_user.id)
+        .first()
+    )
+
+    if not therapy_session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    # Get entities for this session
+    entities = (
+        session.query(Node)
+        .join(ChatReference)
+        .filter(ChatReference.chat_id.in_(session.query(Chat.id).filter(Chat.therapy_session_id == session_id)))
+        .all()
+    )
+
+    return {
+        "session_id": session_id,
+        "entities": [{"id": e.id, "label": e.label, "type": e.type} for e in entities],
+    }
+
+
 @router.websocket("/ws/session/{therapy_session_id}")
-async def websocket_endpoint(
-        websocket: WebSocket,
-        therapy_session_id: int
-):
+async def websocket_endpoint(websocket: WebSocket, therapy_session_id: int):
     """Websocket endpoint for the therapy session."""
     await websocket.accept()
     try:
@@ -79,7 +103,7 @@ async def websocket_endpoint(
         # Get existing or initial chat messages  - TODO needs to be async
         messages_to_send = therapy_session.get_messages()
         # Send initial therapist message
-        await websocket.send_json(messages_to_send.model_dump(mode='json'))
+        await websocket.send_json(messages_to_send.model_dump(mode="json"))
 
         while True:
             logger.info("Entering Chat While Loop - Waiting for message")
@@ -88,11 +112,12 @@ async def websocket_endpoint(
             # Process user message and generate therapist response - TODO needs to be async
             messages_to_send = therapy_session.generate_response(user_text)
             # Send therapist response
-            await websocket.send_json(messages_to_send.model_dump(mode='json'))
+            await websocket.send_json(messages_to_send.model_dump(mode="json"))
     except WebSocketDisconnect:
         pass
     finally:
-        if websocket.application_state == WebSocketState.CONNECTED \
-                and websocket.client_state == WebSocketState.CONNECTED:
+        if (
+            websocket.application_state == WebSocketState.CONNECTED
+            and websocket.client_state == WebSocketState.CONNECTED
+        ):
             await websocket.close()
-

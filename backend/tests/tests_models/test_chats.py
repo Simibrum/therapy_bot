@@ -1,15 +1,20 @@
 """Tests for the chats models."""
-import pytest
-from models import Chat
-from sqlalchemy.orm import sessionmaker
-import numpy as np
 from unittest.mock import patch
 
+import numpy as np
+from models import Chat, Therapist, User
+from pytest_mock import MockerFixture
+from sqlalchemy import Engine
+from sqlalchemy.orm import sessionmaker
 
-def test_chat_model(db_setup, user_instance, therapist_instance, chat_instance):
-    test_engine = db_setup
-    Session = sessionmaker(bind=test_engine)
-    session = Session()
+
+def test_chat_model(
+    sync_db_setup: Engine, user_instance: User, therapist_instance: Therapist, chat_instance: Chat
+) -> None:
+    """Test the chat model."""
+    test_engine = sync_db_setup
+    session_factory = sessionmaker(bind=test_engine)
+    session = session_factory()
 
     # Retrieve the chat from the database
     retrieved_chat = session.query(Chat).filter_by(id=chat_instance.id).one()
@@ -30,11 +35,19 @@ def test_chat_model(db_setup, user_instance, therapist_instance, chat_instance):
     session.close()
 
 
-@patch('models.chats.get_embedding', return_value=np.array([0.1, 0.2, 0.3]))
-def test_fetch_text_vector(mock_get_embedding, db_setup, user_instance, therapist_instance, chat_instance):
-    test_engine = db_setup
-    Session = sessionmaker(bind=test_engine)
-    session = Session()
+@patch("models.chat.get_embedding", return_value=np.array([0.1, 0.2, 0.3]))
+def test_fetch_text_vector(
+    mock_get_embedding: MockerFixture,
+    sync_db_setup: Engine,
+    user_instance: User,
+    therapist_instance: Therapist,
+    chat_instance: Chat,
+) -> None:
+    """Test fetching the text vector."""
+    assert therapist_instance
+    test_engine = sync_db_setup
+    session_factory = sessionmaker(bind=test_engine)
+    session = session_factory()
 
     # Retrieve the chat from the database
     retrieved_chat = session.query(Chat).filter_by(id=chat_instance.id).one()

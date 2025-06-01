@@ -2,7 +2,7 @@
 
 from concurrent.futures import ThreadPoolExecutor
 
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.dependencies import manager
@@ -20,14 +20,14 @@ origins = [
     "http://192.168.32.2:3000",
     "http://172.29.0.3:3000",
     "http://172.29.0.2:3000",
-    FRONTEND_URL
+    FRONTEND_URL,
     # Add any other origins you might have
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_origin_regex='https?://.*',  # TODO REMEMBER TO CHANGE THIS IN PRODUCTION
+    allow_origin_regex="https?://.*",  # TODO REMEMBER TO CHANGE THIS IN PRODUCTION
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

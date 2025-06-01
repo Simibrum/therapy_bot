@@ -1,0 +1,71 @@
+# Version of Dockerfile_dev for GPU support
+
+# Get Ubuntu server image with GPU support - just in case we need it later
+# CUDA version needs to be lower than the local CUDA version
+FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04
+
+# Set time zone parameters for tzdata
+ARG DEBIAN_FRONTEND="noninteractive"
+ENV TZ="Europe/London"
+
+# Three lines below can be used to install Python 3.11 but this seems incompatible with tprchvision
+# RUN apt-get update
+# RUN apt-get install software-properties-common -y
+# RUN add-apt-repository ppa:deadsnakes/ppa
+RUN apt-get update && apt-get install -y unattended-upgrades
+
+# Run unattended-upgrades
+RUN unattended-upgrade -d
+
+# Install packages
+RUN apt-get install --yes --no-install-recommends \
+    openssh-client \
+    git \
+    wget \
+    ca-certificates \
+    python3.11 \
+    python3.11-dev \
+    python3.11-distutils \
+    python3.11-venv \
+    build-essential \
+    libpq-dev
+
+# Install time zone data
+RUN apt-get install -y tzdata
+
+# Clean up
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Switch to a custom user
+# Run the application with a non-root user
+RUN addgroup --system app && adduser --system --group app
+
+
+# Create virtual environment so we use the right pip etc
+RUN python3.11 -m venv /opt/venv
+
+ENV PATH="/opt/venv/bin:$PATH"
+RUN pip3 --version
+
+# Install pip and python tools
+RUN pip3 install -U pip setuptools wheel
+
+# Install GPU spacy
+# Install Pytorch separately to avoid an issue with GPU
+RUN pip3 install torch torchvision torchaudio
+
+# Install Spacy - Specify a CUDA version that matches the docker image
+RUN pip3 install -U spacy[cuda-autodetect] \
+    && python3 -m spacy download en_core_web_trf
+
+# Copy over requirements.txt and install packages
+COPY ./requirements.txt /app/requirements.txt
+
+# Install packages
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+# Copy over the rest of the app
+COPY . /app
+
+# Set the working directory
+WORKDIR /app

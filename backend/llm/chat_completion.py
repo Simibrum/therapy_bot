@@ -1,4 +1,6 @@
 """Functions to handle chat completion."""
+from __future__ import annotations
+
 from llm.common import api_request
 
 
@@ -11,9 +13,7 @@ def get_chat_completion(
     temperature: float = 0.3,
 ) -> str:
     """Get a chat completion from the OpenAI API."""
-    messages = [
-        {"role": "system", "content": system_prompt}
-    ]
+    messages = [{"role": "system", "content": system_prompt}]
     if history:
         messages.append({"role": "user", "content": history})
     if briefing_messages:
@@ -21,9 +21,4 @@ def get_chat_completion(
 
     messages.append({"role": "user", "content": next_message_prompt})
 
-    response = api_request(
-        messages=messages,
-        model=model,
-        temperature=temperature
-    )
-    return response
+    return api_request(messages=messages, model=model, temperature=temperature)

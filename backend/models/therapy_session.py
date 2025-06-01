@@ -1,15 +1,16 @@
 """Model for a therapy session."""
 
-from sqlalchemy import Column, Integer, ForeignKey, DateTime, func
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, func
+from sqlalchemy.orm import relationship
+
 from database import Base
 
 
 class TherapySession(Base):
-    __tablename__ = 'therapy_sessions'
+    __tablename__ = "therapy_sessions"
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    therapist_id = Column(Integer, ForeignKey('therapists.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    therapist_id = Column(Integer, ForeignKey("therapists.id"), nullable=False)
     start_time = Column(DateTime, default=func.now())
     end_time = Column(DateTime, nullable=True)
 

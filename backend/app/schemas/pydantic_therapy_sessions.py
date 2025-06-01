@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict
 
 class TherapySessionOut(BaseModel):
     """Output pydantic model for a therapy session."""
+
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -18,4 +19,5 @@ class TherapySessionOut(BaseModel):
 
 class TherapySessionListOut(BaseModel):
     """List of TherapySessionOut models."""
+
     sessions: list[TherapySessionOut]

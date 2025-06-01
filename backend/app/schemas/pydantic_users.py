@@ -1,5 +1,6 @@
 """File to store login and security-related classes and functions."""
 from typing import Optional
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -47,6 +48,7 @@ class UserLogin(BaseModel):
 
 class UserLoginOut(BaseModel):
     """Model to return useful user details on login."""
+
     access_token: str
     refresh_token: Optional[str] = None
     token_type: str

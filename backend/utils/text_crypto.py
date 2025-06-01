@@ -1,6 +1,7 @@
 """Cryptographic functions for the backend."""
 
 import base64
+
 from cryptography.fernet import Fernet
 
 
@@ -8,12 +9,15 @@ def encrypt_string(key: bytes, plaintext: str) -> str:
     """
     Encrypts a string using the given key and returns a Base64-encoded ciphertext.
 
-    Parameters:
+    Parameters
+    ----------
         key (bytes): The encryption key.
         plaintext (str): The string to be encrypted.
 
-    Returns:
+    Returns
+    -------
         str: The Base64-encoded encrypted string.
+
     """
     cipher_suite = Fernet(key)
     ciphertext_bytes = cipher_suite.encrypt(plaintext.encode())
@@ -25,12 +29,15 @@ def decrypt_string(key: bytes, ciphertext_base64: str) -> str:
     """
     Decrypts a Base64-encoded string using the given key.
 
-    Parameters:
+    Parameters
+    ----------
         key (bytes): The encryption key.
         ciphertext_base64 (str): The Base64-encoded encrypted string.
 
-    Returns:
+    Returns
+    -------
         str: The decrypted string.
+
     """
     ciphertext_bytes = base64.urlsafe_b64decode(ciphertext_base64.encode())
     cipher_suite = Fernet(key)

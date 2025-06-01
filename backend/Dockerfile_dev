@@ -1,0 +1,28 @@
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.11
+
+# Update
+RUN apt-get update && apt-get install -y unattended-upgrades
+
+# Run unattended-upgrades
+RUN unattended-upgrade -d
+
+# Install packages
+RUN apt-get install --yes --no-install-recommends \
+    graphviz
+
+# Install time zone data
+RUN apt-get install -y tzdata
+
+# Clean up
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install Spacy in CPU mode - use small model to avoid installing torch
+RUN pip3 install -U spacy
+RUN python3 -m spacy download en_core_web_sm
+
+COPY ./requirements.txt /app/requirements.txt
+
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+COPY . /app
+

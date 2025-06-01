@@ -7,7 +7,6 @@ from llm.embeddings import get_embedding
 
 def test_get_embedding(mocked_embedding_client):
     """Test the get_embedding function."""
-
     # Call the get_embedding function
     embedding = get_embedding("Some text")
 

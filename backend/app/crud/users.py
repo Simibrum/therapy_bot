@@ -1,11 +1,11 @@
 """CRUD methods for users."""
-from typing import Optional, List
+from typing import List, Optional
 
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
-from app.schemas.pydantic_users import UserUpdate, UserOut
-from models import User, RoleEnum
+from app.schemas.pydantic_users import UserOut, UserUpdate
+from models import RoleEnum, User
 
 
 def get_user_by_username(session: Session, username: str) -> Optional[User]:
@@ -23,12 +23,7 @@ def create_user(session: Session, user_in: UserUpdate) -> UserOut:
     """Create a new user."""
     # Convert role to an enum
     role = RoleEnum(user_in.role) if user_in.role in RoleEnum.__members__ else RoleEnum.USER
-    user = User(
-        username=user_in.username,
-        email=user_in.email,
-        password_hash="temp",
-        role=role
-    )
+    user = User(username=user_in.username, email=user_in.email, password_hash="temp", role=role)
     user.set_password(user_in.password)
     session.add(user)
     session.commit()
@@ -50,9 +45,8 @@ def get_users(session: Session) -> List[UserOut]:
     return [UserOut(**user.as_dict()) for user in users]
 
 
-def update_user(session: Session, user_hash_id, user_in: UserUpdate) -> Optional[UserOut]:
+def update_user(session: Session, user_id, user_in: UserUpdate) -> Optional[UserOut]:
     """Update a user."""
-    user_id = decode_id(user_hash_id)
     user = session.query(User).filter(User.id == user_id).first()
     if not user:
         return None
@@ -67,7 +61,7 @@ def delete_user(session: Session, username: str) -> None:
     """Delete a user."""
     user = session.query(User).filter(User.username == username).first()
     if not user:
-        return None
+        return
     session.delete(user)
     session.commit()
-    return None
+    return

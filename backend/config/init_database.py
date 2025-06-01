@@ -1,11 +1,13 @@
 """Methods to initialise the database."""
 import os
 
-from config import logger
 from database import Base
 from database.db_engine import DBSessionManager
+
 # Need to import these even if not using them
-from models import User, Therapist
+from models import Therapist, User
+
+from config import logger
 
 
 def create_default_user():
@@ -17,11 +19,7 @@ def create_default_user():
     username = os.getenv("DEFAULT_USER", "i-am-admin")
     email = os.getenv("DEFAULT_EMAIL", "me@great.com")
     password = os.getenv("DEFAULT_PASSWORD", "a-really-bad-password")
-    user = User(
-        username=username,
-        email=email,
-        password_hash="1234567"
-    )
+    user = User(username=username, email=email, password_hash="1234567")  # nosec B106
     user.set_password(password)
     first_name = "Brian"
     user.first_name = first_name
@@ -48,7 +46,7 @@ def create_default_therapist():
         last_name="Hall",
         user_id=user.id,
         residence="Bristol",
-        description=description
+        description=description,
     )
     session.add(therapist)
     session.commit()
@@ -69,6 +67,6 @@ def create_tables():
     create_default_therapist()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Create the tables
     create_tables()

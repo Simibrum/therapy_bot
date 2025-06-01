@@ -6,11 +6,16 @@ fastapi-login
 httpx
 pydantic>=2.0.0
 websockets
+python-multipart
 
 # Database
-sqlalchemy
+sqlalchemy[asyncio]
 cryptography
 alembic
+
+# Async DB
+asyncpg
+aiosqlite
 
 # Testing
 pytest
@@ -28,8 +33,20 @@ requests
 # Code formatting
 black
 
+# nlp
+spacy
+
 # QA / Agent functionality
 langchain
 openai>=1.2.0
 tiktoken
 numpy
+
+# Graph stuff
+graphviz
+
+# Development
+pre-commit
+ruff
+wily
+bandit

@@ -44,7 +44,7 @@ def read_version_from_file():
     parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
     # Set path of version file
     filename = os.path.join(parent_dir, "version.txt")
-    with open(filename, 'r') as file:
+    with open(filename) as file:
         # Read the first line and strip any newline characters or spaces
         version = file.readline().strip()
     return version

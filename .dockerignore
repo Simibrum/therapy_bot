@@ -1,0 +1,18 @@
+# Files for Docker to ignore
+# https://docs.docker.com/engine/reference/builder/#dockerignore-file
+
+# Standard files to ignore
+**/.git
+**/.gitignore
+**/.vscode
+**/coverage
+**/.env
+**/.aws
+**/.ssh
+**/__pycache__
+Dockerfile*
+README.md
+docker-compose*.yml
+**/.DS_Store
+**/venv
+**/env

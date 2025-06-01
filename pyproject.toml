@@ -1,0 +1,22 @@
+[tool.ruff]
+lint.ignore-init-module-imports = true
+lint.select = ["ALL"]
+lint.ignore = [
+    "D204", # 1 blank line required after class docstring
+    "D203", # Space before class docstring
+    "D211", # No blank lines allowed before class docstring
+    "D212", # Multi-line docstring summary should start at the second line
+    "D213",
+    "COM812", # Missing trailing comma in Python 3.6+
+    "ISC001",
+    "RET505",  # Returns before else
+    "T201", # Sometimes need some prints
+    "INP001", # Implicit namespace packages are discouraged - src is copied to docker
+    "S101", # Use of assert - we use it for testing
+    "ANN101", # Missing type annotation for self in method
+]
+line-length = 120
+
+[tool.ruff.lint.per-file-ignores]
+# Ignore docstrings and type annotations in tests
+"**/tests/*" = ["D101", "D102", "ANN201"]

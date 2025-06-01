@@ -18,21 +18,17 @@ client = OpenAI(api_key=openai_api_key)
 # TODO Switch to ASync Client
 def chat_completion_wrapper(model, messages, temperature: float = 0.7):
     """Wrap the openai chat completion API to allow test substitution."""
-    response = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        temperature=temperature
-    )
+    response = client.chat.completions.create(model=model, messages=messages, temperature=temperature)
     response = response.choices[0].message.content
     return response
 
 
 def api_request(
-        text: str = None,
-        messages: List[dict] = None,
-        model: str = MODEL,
-        temperature: float = 0.7,
-        gen_logger: Logger = logger
+    text: str = None,
+    messages: List[dict] = None,
+    model: str = MODEL,
+    temperature: float = 0.7,
+    gen_logger: Logger = logger,
 ) -> List[List[float]] | str:
     """Make a request to the openai api."""
     max_tries = 5
@@ -49,7 +45,7 @@ def api_request(
         try:
             # gen_logger.info(f"Making API request with {model}")
             if model.startswith("text-embedding"):
-                gen_logger.info(f"Making API request for text embedding")
+                gen_logger.info("Making API request for text embedding")
                 response = client.embeddings.create(input=text, model=model)
                 result = response.data[0].embedding
             else:
@@ -62,12 +58,9 @@ def api_request(
                 return []
 
             delay = min(initial_delay * (backoff_factor ** (attempt - 1)), max_delay)
-            jitter = random.uniform(jitter_range[0], jitter_range[1])
+            jitter = random.uniform(jitter_range[0], jitter_range[1])  # nosec: B311
             sleep_time = delay + jitter
-            gen_logger.error(
-                f"API request failed with error: {e}. "
-                f"Retrying in {sleep_time:.2f} seconds."
-            )
+            gen_logger.error(f"API request failed with error: {e}. " f"Retrying in {sleep_time:.2f} seconds.")
             time.sleep(sleep_time)
 
 
@@ -89,6 +82,3 @@ def num_tokens_from_messages(messages, model="gpt-3.5-turbo-0301"):
         return num_tokens
     else:
         raise NotImplementedError(f"""num_tokens_from_messages() is not presently implemented for model {model}.""")
-
-
-
