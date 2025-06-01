@@ -6,6 +6,7 @@ fastapi-login
 httpx
 pydantic>=2.0.0
 websockets
+python-multipart
 
 # Database
 sqlalchemy[asyncio]

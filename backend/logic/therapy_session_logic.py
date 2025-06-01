@@ -2,13 +2,15 @@
 from typing import Optional
 
 import numpy as np
-
 from app.schemas import ChatListOut, ChatOut, TherapistOut, UserOut
 from config import logger
 from database.db_engine import DBSessionManager
 from llm import prompt_builder
 from llm.chat_completion import get_chat_completion
 from models import Chat, Therapist, TherapySession, User
+from spacy_nlp import nlp_service
+
+from logic.process_chat_create_nodes import process_text_and_create_references
 
 
 # Define exceptions
@@ -64,6 +66,12 @@ class TherapySessionLogic:
         else:
             raise ValueError("Must provide either a user id or a pre-existing session id")
         self.system_prompt = self.build_system_prompt()
+        # Initialise Spacy
+        try:
+            self.nlp = nlp_service.get_nlp()
+        except OSError:
+            logger.warning("Could not load NLP service")
+            self.nlp = None
 
     @property
     def first_chat(self) -> bool:
@@ -130,6 +138,15 @@ class TherapySessionLogic:
             new_chat.fetch_text_vector()
             # Commit to save text and vector
             session.commit()
+            # NEW: Extract entities only from user messages
+            if sender == "user" and self.nlp is not None:
+                try:
+                    process_text_and_create_references(
+                        text=text, chat_id=new_chat.id, user_id=self.user_id, db=session, nlp=self.nlp
+                    )
+                except Exception as e:
+                    logger.error(f"Entity extraction failed: {e}")
+                    # Don't let entity extraction break the chat flow
             chat_out = ChatOut.model_validate(new_chat)
             if new_chat.id not in self.index_to_id.values():
                 self.index_to_id[len(self.index_to_id)] = new_chat.id

@@ -1,7 +1,6 @@
 from logging.config import fileConfig
 
 from alembic import context
-
 from database import Base
 from database.db_engine import DBSessionManager
 
@@ -21,6 +20,9 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata  # Edited from default - This is the metadata from the models
+
+# Import all the models
+from models import *  # noqa: F403
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
