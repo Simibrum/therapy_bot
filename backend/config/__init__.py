@@ -35,6 +35,9 @@ USE_GPU = os.getenv("USE_GPU", "False").lower() == "true"
 # SPACY Model
 SPACY_MODEL = os.getenv("SPACY_MODEL", "en_core_web_sm")
 
+# ASYNC - whether to use async database
+ASYNC_DB = os.getenv("ASYNC_DB", "True").lower() == "true"
+
 
 class ProductionConfig:
     """Production configuration - e.g. for remote deployment."""
@@ -72,6 +75,10 @@ class TestConfig:
     # Switch to temporary file-based DB to avoid issues with DB data being reset between tests
     DATABASE_FILE: ClassVar[Path] = None
     SQLALCHEMY_DATABASE_URI: ClassVar[str] = None
+    if ASYNC_DB:
+        SQLALCHEMY_DATABASE_URI = "sqlite+aiosqlite:///:memory:"
+    else:
+        SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     SQLALCHEMY_ENGINE_OPTIONS: ClassVar[dict] = {"connect_args": {"check_same_thread": False}}
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TESTING = True
@@ -82,7 +89,10 @@ class TestConfig:
     def generate_temp_file(cls) -> None:
         """Generate a temporary database file and update the configuration."""
         cls.DATABASE_FILE = Path(tempfile.mkstemp()[1])
-        cls.SQLALCHEMY_DATABASE_URI = f"sqlite:///{cls.DATABASE_FILE}"
+        if ASYNC_DB:
+            cls.SQLALCHEMY_DATABASE_URI = f"sqlite+aiosqlite:///{cls.DATABASE_FILE}"
+        else:
+            cls.SQLALCHEMY_DATABASE_URI = f"sqlite:///{cls.DATABASE_FILE}"
 
     @staticmethod
     def remove_temp_file() -> None:

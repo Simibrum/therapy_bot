@@ -1,40 +1,43 @@
 """Routes for Therapy Sessions."""
 from typing import Union
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
-
-from app.dependencies import manager
-from app.schemas.pydantic_therapy_sessions import TherapySessionListOut
 from config import logger
-from database import get_db
+from database import get_async_db
+from fastapi import APIRouter, Depends, HTTPException, status
 from logic.therapy_session_logic import TherapySessionLogic
 from models import User
+from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
+
+from app.async_dependencies import manager
+from app.schemas.pydantic_therapy_sessions import TherapySessionListOut
 
 router = APIRouter()
 
 
-def verify_token(token: str) -> Union[User, None]:
+async def verify_token(token: str) -> Union[User, None]:
     """Verify the token and return the user."""
-    # TODO - need to AWAIT this
-    user = manager.get_current_user(token)
+    user = await manager.get_current_user(token)
     return user
 
 
 @router.get("/sessions")
-def get_sessions(session: Session = Depends(get_db), current_user: User = Depends(manager)) -> TherapySessionListOut:
+async def get_sessions(
+    session: AsyncSession = Depends(get_async_db), current_user: User = Depends(manager)
+) -> TherapySessionListOut:
     """Get all therapy sessions for the current user."""
     if not current_user:
         raise HTTPException(status_code=404, detail="User not found")
     # Add the user to the session
     session.add(current_user)
     # Get all therapy sessions for the current user
+    await session.refresh(current_user, ["therapy_sessions"])
+    # Get all therapy sessions for the current user
     return TherapySessionListOut(sessions=current_user.therapy_sessions)
 
 
 @router.post("/sessions/new")
-def new_session(current_user: User = Depends(manager)):
+async def new_session(current_user: User = Depends(manager)):
     """Create a new therapy session."""
     if not current_user:
         raise HTTPException(status_code=404, detail="User not found")

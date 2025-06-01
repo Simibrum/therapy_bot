@@ -1,13 +1,13 @@
 """Route for login."""
 from datetime import timedelta
 
+from database.db_engine import get_async_db
 from fastapi import APIRouter, Depends
 from fastapi_login.exceptions import InvalidCredentialsException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies import manager, query_user
+from app.async_dependencies import async_query_user, manager
 from app.schemas.pydantic_users import UserLogin, UserLoginOut
-from database.db_engine import get_db
 
 router = APIRouter()
 
@@ -17,16 +17,16 @@ router = APIRouter()
 
 
 @router.post("/login")
-def login(
+async def login(
     user_login: UserLogin,
-    session: Session = Depends(get_db),
+    async_session: AsyncSession = Depends(get_async_db),
 ):
     """Authenticate a user and return a cookie."""
     username = user_login.username
     password = user_login.password
     if not username or not password:
         raise InvalidCredentialsException
-    user = query_user(username, session)
+    user = await async_query_user(username, async_session)
     if not user or not (user.is_active and user.check_password(password)):
         raise InvalidCredentialsException
     access_token = manager.create_access_token(data={"sub": username}, expires=timedelta(hours=1))

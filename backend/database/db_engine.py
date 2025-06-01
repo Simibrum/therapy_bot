@@ -4,6 +4,8 @@ See https://stackoverflow.com/questions/59793920/
 how-to-make-sqlalchemy-engine-available-throughout-the-flask-application
 for replacement of db.session
 """
+from contextlib import asynccontextmanager
+
 from config import get_config
 from config.init_logger import logger
 from sqlalchemy import Engine, create_engine
@@ -69,6 +71,7 @@ class DBSessionManager:
         return cls._sync_engine
 
     @classmethod
+    @asynccontextmanager
     async def get_async_session(cls, config=None) -> AsyncSession:
         """Get an asynchronous session."""
         if config is None:
@@ -76,7 +79,11 @@ class DBSessionManager:
         if cls._AsyncSession is None:
             logger.info("Getting asynchronous session")
             cls._AsyncSession = cls.get_async_session_factory(config)
-        return cls._AsyncSession()
+        async with cls._AsyncSession() as session:
+            try:
+                yield session
+            finally:
+                await session.close()
 
     @classmethod
     def get_async_session_factory(cls, config=None) -> async_sessionmaker:
@@ -134,10 +141,9 @@ def get_db() -> Session:
 # Asynchronous database session generator
 async def get_async_db() -> AsyncSession:
     """Get an asynchronous database session from the pool."""
-    try:
-        session_manager = DBSessionManager()
-        async with session_manager.get_async_session() as db:
+    async with DBSessionManager.get_async_session() as db:
+        try:
             logger.debug("Got asynchronous database session for %s", db.bind.url)
             yield db
-    finally:
-        logger.debug("Asynchronous database session closed")
+        finally:
+            logger.debug("Asynchronous database session closed")

@@ -17,6 +17,7 @@ async def async_db_setup():
     print("Setting up async test class & generating DB file")
     TestConfig.generate_temp_file()
     async_db_url = f"sqlite+aiosqlite:///{TestConfig.SQLALCHEMY_DATABASE_URI.split(':///')[-1]}"
+    # async_db_url = "sqlite+aiosqlite:///:memory:"
     print(f"Setting up async tests in DB {async_db_url}")
     async_engine = create_async_engine(async_db_url)
     async_session_factory = sessionmaker(bind=async_engine, class_=AsyncSession, expire_on_commit=False)

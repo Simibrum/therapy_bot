@@ -1,6 +1,30 @@
 # therapy_bot
 This is a proof of concept for a GPT-4 powered chatbot. The project explores how GPT models work with mental health dialogues and plays with chat memory and user profiling.
 
+# Therapy-Bot Project Resurrection - June 2025
+
+## Current State Summary
+- **Branch**: dev_graph_building (main development branch)
+- **Last active**: ~8 months ago
+- **Status**: Mid-migration from sync to async database operations
+
+## Test Results (June 1, 2025)
+- **62 tests failing, 72 passed, 2 ignored** (136 total)
+- **Primary issue**: SQLAlchemy async greenlet context errors
+- **Root cause**: Tests not updated for async database operations
+
+## Architecture Changes in Progress
+- ✅ Async database engine setup
+- ✅ Knowledge graph processor foundation
+- ✅ Chat processor and vector processor modules
+- ❌ Test suite async context migration (incomplete)
+- ❌ Async route handlers (partially complete)
+
+## Next Session Priorities
+1. Fix async test context setup in conftest.py
+2. Update failing tests to use async database sessions
+3. Focus on knowledge graph extraction functionality
+
 ## Languages and Frameworks
 - Python
 - JavaScript

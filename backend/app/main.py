@@ -2,15 +2,15 @@
 
 from concurrent.futures import ThreadPoolExecutor
 
+from config import FRONTEND_URL
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from models import User
 
-from app.dependencies import manager
+from app.async_dependencies import manager
 from app.routes.login import router as login_router
 from app.routes.therapy_sessions import router as therapy_sessions_router
 from app.schemas.pydantic_users import UserOut
-from config import FRONTEND_URL
-from models import User
 
 app = FastAPI()
 

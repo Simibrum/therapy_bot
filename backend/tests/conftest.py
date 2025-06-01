@@ -15,6 +15,7 @@ def _setup_testing_environment() -> None:
     print("Setting up testing environment")
     existing_env = os.environ.get("CONFIG_ENV")
     os.environ["CONFIG_ENV"] = "testing"
+    # os.environ["CONFIG_ENV"] = "async"
     yield  # This will return control to the test function
     if existing_env:
         os.environ["CONFIG_ENV"] = existing_env  # Revert env var in teardown

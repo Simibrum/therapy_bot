@@ -68,7 +68,7 @@ class User(Base, LocationMixin, PersonNameMixin, LifeDatesMixin):
 
     def create_access_token(self, expires_delta: timedelta | None = None) -> str:
         """Create an access token for the user."""
-        from app.dependencies import manager
+        from app.async_dependencies import manager
 
         data = {"sub": self.username}
         if not expires_delta:
