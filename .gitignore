@@ -165,4 +165,4 @@ database/*.db
 /backend/database/dev_database_backup.db
 /htmlReport/
 
-.idea
+.idea/*
