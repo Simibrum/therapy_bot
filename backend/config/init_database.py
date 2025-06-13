@@ -10,7 +10,7 @@ from models import Therapist, User
 from config import logger
 
 
-def create_default_user():
+def create_default_user() -> None:
     """Create a default user."""
     # Get a session
     db = DBSessionManager()
@@ -28,7 +28,7 @@ def create_default_user():
     session.close()
 
 
-def create_default_therapist():
+def create_default_therapist() -> None:
     """Create a default therapist."""
     # Get a session
     db = DBSessionManager()
@@ -52,7 +52,7 @@ def create_default_therapist():
     session.commit()
 
 
-def create_tables():
+def create_tables() -> None:
     """Create all tables."""
     # Get the database engine
     db = DBSessionManager()

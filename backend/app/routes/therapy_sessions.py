@@ -1,25 +1,28 @@
 """Routes for Therapy Sessions."""
-from typing import Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from config import logger
 from database import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from logic.therapy_session_logic import TherapySessionLogic
 from models import Chat, ChatReference, Node, TherapySession, User
-from sqlalchemy.orm import Session
 from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
 
 from app.dependencies import manager
 from app.schemas.pydantic_therapy_sessions import TherapySessionListOut
 
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
 router = APIRouter()
 
 
-def verify_token(token: str) -> Union[User, None]:
+def verify_token(token: str) -> User | None:
     """Verify the token and return the user."""
     # TODO - need to AWAIT this
-    user = manager.get_current_user(token)
-    return user
+    return manager.get_current_user(token)
 
 
 @router.get("/sessions")
@@ -34,7 +37,7 @@ def get_sessions(session: Session = Depends(get_db), current_user: User = Depend
 
 
 @router.post("/sessions/new")
-def new_session(current_user: User = Depends(manager)):
+def new_session(current_user: User = Depends(manager)) -> dict:
     """Create a new therapy session."""
     if not current_user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -44,7 +47,7 @@ def new_session(current_user: User = Depends(manager)):
 
 
 @router.get("/sessions/{session_id}/entities")
-def get_session_entities(session_id: int, session: Session = Depends(get_db), current_user: User = Depends(manager)):
+def get_session_entities(session_id: int, session: Session = Depends(get_db), current_user: User = Depends(manager)) -> dict:
     """Get extracted entities for a therapy session."""
     # Verify session belongs to user
     therapy_session = (
@@ -71,7 +74,7 @@ def get_session_entities(session_id: int, session: Session = Depends(get_db), cu
 
 
 @router.websocket("/ws/session/{therapy_session_id}")
-async def websocket_endpoint(websocket: WebSocket, therapy_session_id: int):
+async def websocket_endpoint(websocket: WebSocket, therapy_session_id: int) -> None:
     """Websocket endpoint for the therapy session."""
     await websocket.accept()
     try:

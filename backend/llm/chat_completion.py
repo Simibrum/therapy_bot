@@ -7,8 +7,8 @@ from llm.common import api_request
 def get_chat_completion(
     next_message_prompt: str,
     system_prompt: str,
-    history: str = None,
-    briefing_messages: list[str] = None,
+    history: str | None = None,
+    briefing_messages: list[str] | None = None,
     model: str = "gpt-3.5-turbo",
     temperature: float = 0.3,
 ) -> str:

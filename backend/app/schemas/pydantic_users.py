@@ -1,17 +1,17 @@
 """File to store login and security-related classes and functions."""
-from typing import Optional
+from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict
 
 
 class Token(BaseModel):
     access_token: str
-    refresh_token: Optional[str] = None
+    refresh_token: str | None = None
     token_type: str
 
 
 class TokenData(BaseModel):
-    username: Optional[str] = None
+    username: str | None = None
 
 
 class UserOut(BaseModel):
@@ -19,14 +19,14 @@ class UserOut(BaseModel):
 
     id: int
     username: str
-    email: Optional[str] = None
-    is_active: Optional[bool] = None
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    address: Optional[str] = None
-    city: Optional[str] = None
-    country: Optional[str] = None
-    age: Optional[int] = None
+    email: str | None = None
+    is_active: bool | None = None
+    first_name: str | None = None
+    last_name: str | None = None
+    address: str | None = None
+    city: str | None = None
+    country: str | None = None
+    age: int | None = None
 
 
 class UserInDB(UserOut):
@@ -34,11 +34,11 @@ class UserInDB(UserOut):
 
 
 class UserUpdate(BaseModel):
-    username: Optional[str] = None
-    email: Optional[str] = None
-    password: Optional[str] = None
-    is_active: Optional[bool] = None
-    role: Optional[str] = None
+    username: str | None = None
+    email: str | None = None
+    password: str | None = None
+    is_active: bool | None = None
+    role: str | None = None
 
 
 class UserLogin(BaseModel):
@@ -50,9 +50,9 @@ class UserLoginOut(BaseModel):
     """Model to return useful user details on login."""
 
     access_token: str
-    refresh_token: Optional[str] = None
+    refresh_token: str | None = None
     token_type: str
     id: int
     username: str
-    first_name: Optional[str] = None
+    first_name: str | None = None
     is_active: bool

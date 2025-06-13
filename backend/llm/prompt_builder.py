@@ -55,16 +55,14 @@ def build_first_message_prompt() -> str:
 
 def build_recent_session_history(history: ChatListOut) -> str:
     """Build the recent session history prompt."""
-    history_string = f"[Here is a summary of your recent session history:\n\n {ChatListOut.as_string}"
-    return history_string
+    return f"[Here is a summary of your recent session history:\n\n {ChatListOut.as_string}"
 
 
 def build_next_message_prompt(user_input: str) -> str:
     """Build the next message prompt."""
-    next_message_string = (
+    return (
         f"[The user last said: {user_input}\n\n"
         f"Provide a next message to the user to continue the therapy session."
         f'(OMIT "Therapist: " from the start of your message.) '
         f"]"
     )
-    return next_message_string

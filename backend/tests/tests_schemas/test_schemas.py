@@ -2,7 +2,6 @@
 import datetime
 
 import pytest
-
 from app.schemas.pydantic_chats import ChatListOut, ChatOut
 
 

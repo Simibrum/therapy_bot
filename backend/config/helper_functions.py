@@ -3,7 +3,7 @@ import os
 
 
 # Load the environment variables if working in weird environments
-def load_from_env_file():
+def load_from_env_file() -> None:
     """Load environment variables from a file."""
     # Load environment variables from project root .env file
     # Get the current file's directory
@@ -20,7 +20,7 @@ def load_from_env_file():
         pass
 
 
-def load_env_vars(path):
+def load_env_vars(path) -> None:
     """Load environment variables from a file."""
     with open(path) as f:
         for line in f:
@@ -46,5 +46,4 @@ def read_version_from_file():
     filename = os.path.join(parent_dir, "version.txt")
     with open(filename) as file:
         # Read the first line and strip any newline characters or spaces
-        version = file.readline().strip()
-    return version
+        return file.readline().strip()

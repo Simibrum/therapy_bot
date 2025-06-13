@@ -32,7 +32,7 @@ class AsyncTestConfig:
 
 
 # Fixture for sync tests
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def sync_db_session_manager():
     manager = DBSessionManager()
     engine = manager.get_sync_engine(SyncTestConfig())

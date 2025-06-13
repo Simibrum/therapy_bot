@@ -2,15 +2,15 @@
 
 from concurrent.futures import ThreadPoolExecutor
 
+from config import FRONTEND_URL
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from models import User
 
 from app.dependencies import manager
 from app.routes.login import router as login_router
 from app.routes.therapy_sessions import router as therapy_sessions_router
 from app.schemas.pydantic_users import UserOut
-from config import FRONTEND_URL
-from models import User
 
 app = FastAPI()
 
@@ -42,12 +42,12 @@ app.include_router(therapy_sessions_router)
 
 
 @app.get("/")
-def read_root():
+def read_root() -> dict:
     return {"message": "Hello, World!"}
 
 
 @app.get("/users/me")
-async def read_users_me(current_user: User = Depends(manager)):
+async def read_users_me(current_user: User = Depends(manager)) -> UserOut:
     """Return details of the current user."""
     if current_user.is_active:
         return UserOut.model_validate(current_user)

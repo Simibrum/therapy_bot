@@ -1,11 +1,12 @@
 """Command to reset the database."""
-from config.init_database import create_tables
-from config.init_logger import logger
 from database import Base
 from database.db_engine import DBSessionManager
 
+from config.init_database import create_tables
+from config.init_logger import logger
 
-def reset_database():
+
+def reset_database() -> None:
     """Function to reset the database."""
     # Get the database engine
     db = DBSessionManager()

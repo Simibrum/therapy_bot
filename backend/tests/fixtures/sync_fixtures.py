@@ -2,14 +2,17 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 from config import TZ_INFO, TestConfig
 from database import Base, DBSessionManager
 from logic.therapy_session_logic import TherapySessionLogic
 from models import Chat, Therapist, TherapySession, User
-from sqlalchemy import Engine
 from sqlalchemy.orm import Session, sessionmaker
+
+if TYPE_CHECKING:
+    from sqlalchemy import Engine
 
 
 @pytest.fixture()

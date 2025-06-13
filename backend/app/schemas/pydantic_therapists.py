@@ -1,6 +1,6 @@
 """Pydantic schema for the therapists model."""
 
-from typing import Optional
+from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict
 
@@ -12,7 +12,7 @@ class TherapistOut(BaseModel):
 
     id: int
     user_id: int
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    residence: Optional[str] = None
-    description: Optional[str] = None
+    first_name: str | None = None
+    last_name: str | None = None
+    residence: str | None = None
+    description: str | None = None

@@ -1,11 +1,11 @@
 """CRUD methods for users."""
 from typing import List, Optional
 
+from models import RoleEnum, User
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from app.schemas.pydantic_users import UserOut, UserUpdate
-from models import RoleEnum, User
 
 
 def get_user_by_username(session: Session, username: str) -> Optional[User]:

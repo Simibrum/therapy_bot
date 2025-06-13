@@ -3,7 +3,7 @@
 import pytest
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def test_client():
     """Get the test client."""
     from app.main import app
@@ -12,7 +12,7 @@ def test_client():
     return TestClient(app)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def authenticated_test_client(test_client, user_instance):
     """Get the test client with an authenticated user."""
     token = user_instance.create_access_token()

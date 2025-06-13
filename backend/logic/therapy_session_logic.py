@@ -33,11 +33,11 @@ class TherapistDoesNotExistError(Exception):
 class TherapySessionLogic:
     def __init__(
         self,
-        user_id: int = None,
-        therapist_id: int = None,
-        pre_existing_session_id: int = None,
+        user_id: Optional[int] = None,
+        therapist_id: Optional[int] = None,
+        pre_existing_session_id: Optional[int] = None,
         db_session_manager: DBSessionManager = None,
-    ):
+    ) -> None:
         """Initialise the therapy session."""
         self.db_session_manager = db_session_manager or DBSessionManager()
         self.chat_vectors = None
@@ -46,11 +46,14 @@ class TherapySessionLogic:
             logger.debug("Using pre-existing therapy session")
             therapy_session = self.get_therapy_session(pre_existing_session_id)
             if not therapy_session:
-                raise TherapySessionDoesNotExistError("Therapy session does not exist")
+                msg = "Therapy session does not exist"
+                raise TherapySessionDoesNotExistError(msg)
             if user_id and therapy_session.user_id != user_id:
-                raise UserIdMismatchError("User id does not match")
+                msg = "User id does not match"
+                raise UserIdMismatchError(msg)
             if therapist_id and therapy_session.therapist_id != therapist_id:
-                raise TherapistIdMismatchError("Therapist id does not match")
+                msg = "Therapist id does not match"
+                raise TherapistIdMismatchError(msg)
             self.user_id = therapy_session.user_id
             self.therapist_id = therapy_session.therapist_id
             self.therapy_session_id = pre_existing_session_id
@@ -64,7 +67,8 @@ class TherapySessionLogic:
             logger.debug("Creating new therapy session")
             self.therapy_session_id = self.create_therapy_session()
         else:
-            raise ValueError("Must provide either a user id or a pre-existing session id")
+            msg = "Must provide either a user id or a pre-existing session id"
+            raise ValueError(msg)
         self.system_prompt = self.build_system_prompt()
         # Initialise Spacy
         try:
@@ -80,15 +84,15 @@ class TherapySessionLogic:
             first_chat = session.query(Chat).filter(Chat.therapy_session_id == self.therapy_session_id).first()
             return first_chat is None
 
-    def get_therapy_session(self, therapy_session_id: int = None) -> TherapySession:
+    def get_therapy_session(self, therapy_session_id: Optional[int] = None) -> TherapySession:
         """Check if the therapy session exists in the database."""
         if not therapy_session_id:
             if not self.therapy_session_id:
-                raise ValueError("Must provide a therapy session id")
+                msg = "Must provide a therapy session id"
+                raise ValueError(msg)
             therapy_session_id = self.therapy_session_id
         with self.db_session_manager.get_session() as session:
-            therapy_session = session.query(TherapySession).filter(TherapySession.id == therapy_session_id).first()
-            return therapy_session
+            return session.query(TherapySession).filter(TherapySession.id == therapy_session_id).first()
 
     def create_therapy_session(self):
         """Create a new therapy session."""
@@ -104,10 +108,11 @@ class TherapySessionLogic:
         with self.db_session_manager.get_session() as session:
             therapist = session.query(Therapist).filter(Therapist.user_id == self.user_id).first()
             if not therapist:
-                raise TherapistDoesNotExistError("Therapist does not exist")
+                msg = "Therapist does not exist"
+                raise TherapistDoesNotExistError(msg)
             return therapist.id
 
-    def load_all_session_previous_chats(self):
+    def load_all_session_previous_chats(self) -> None:
         """Load previous chats from the database and their vectors into memory."""
         with self.db_session_manager.get_session() as session:
             previous_chats = (
@@ -164,10 +169,9 @@ class TherapySessionLogic:
             self.load_all_session_previous_chats()
         if self.chat_vectors is None:
             return []
-        similarity_scores = (self.chat_vectors @ query_vector) / (
+        return (self.chat_vectors @ query_vector) / (
             np.linalg.norm(self.chat_vectors, axis=1) * np.linalg.norm(query_vector)
         )
-        return similarity_scores
 
     def get_relevant_past_chat_ids(self, user_input_vector, threshold: int = 0.75):
         """Fetch relevant past chats based on cosine similarity."""
@@ -191,8 +195,7 @@ class TherapySessionLogic:
         """Get all messages in the therapy session."""
         with self.db_session_manager.get_session() as session:
             messages = session.query(Chat).filter(Chat.therapy_session_id == self.therapy_session_id).all()
-            chat_list_out = ChatListOut(messages=messages)
-            return chat_list_out
+            return ChatListOut(messages=messages)
 
     def start_session(self) -> ChatListOut:
         """Start a new therapy session and return initial messages."""

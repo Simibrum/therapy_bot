@@ -1,10 +1,9 @@
 """Defines a mixin for models that have a bytes vector field."""
 import numpy as np
+from config import logger
 from sqlalchemy import LargeBinary
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column
-
-from config import logger
 
 
 class BytesVectorMixin:
@@ -38,13 +37,16 @@ class BytesVectorMixin:
         else:
             # Validate the vector - must be a numpy array
             if not isinstance(vector, np.ndarray):
-                raise TypeError(f"Vector must be a numpy array, not {type(vector)}.")
+                msg = f"Vector must be a numpy array, not {type(vector)}."
+                raise TypeError(msg)
             # Validate the vector - must be 1D
             if len(vector.shape) != 1:
-                raise ValueError(f"Vector must be 1D, not {len(vector.shape)}D.")
+                msg = f"Vector must be 1D, not {len(vector.shape)}D."
+                raise ValueError(msg)
             # Validate the vector - elements should be floats or ints
             if not np.issubdtype(vector.dtype, np.number):
-                raise ValueError(f"Vector elements must be numbers, not {vector.dtype}.")
+                msg = f"Vector elements must be numbers, not {vector.dtype}."
+                raise ValueError(msg)
             # If entries are ints convert to floats
             if np.issubdtype(vector.dtype, np.integer):
                 vector = vector.astype(float)

@@ -1,13 +1,16 @@
 """Fixtures that work for both sync and async tests."""
 from __future__ import annotations
 
-from typing import NamedTuple
-from unittest.mock import AsyncMock, MagicMock, NonCallableMagicMock
+from typing import TYPE_CHECKING, NamedTuple
 
 import pytest
-from pytest_mock import MockerFixture
-from spacy import Language
 from spacy_nlp import NLPService
+
+if TYPE_CHECKING:
+    from unittest.mock import AsyncMock, MagicMock, NonCallableMagicMock
+
+    from pytest_mock import MockerFixture
+    from spacy import Language
 
 
 @pytest.fixture()
