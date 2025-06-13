@@ -15,31 +15,25 @@ from sqlalchemy.orm import Session
 
 class KnowledgeGraphProcessor:
     """Class to process Chat objects and create/update a knowledge graph."""
-    def __init__(self, db: Union[Session, AsyncSession], nlp: spacy.language.Language):
+    def __init__(self, db: Union[Session, AsyncSession], nlp: spacy.language.Language) -> None:
         self.db = db
         self.nlp = nlp
 
     async def process_chat(self, chat: Chat) -> None:
-        """
-        Process a Chat object and update the knowledge graph asynchronously.
-        """
+        """Process a Chat object and update the knowledge graph asynchronously."""
         entities = self.extract_entities(chat.text)
         nodes = await self.create_or_update_nodes(entities, chat.user_id)
         edges = await self.create_edges(nodes, chat)
         await self.update_graph(nodes, edges)
 
     def extract_entities(self, text: str) -> List[Dict]:
-        """
-        Extract entities from the given text using NLP.
-        """
+        """Extract entities from the given text using NLP."""
         doc = self.nlp(text)
         return get_nodes(doc)
 
     @staticmethod
     def _match_node_by_string(label: str, candidate_nodes: List[Node]) -> Node:
-        """
-        Match a node to an existing node in a list of nodes.
-        """
+        """Match a node to an existing node in a list of nodes."""
         return next((n for n in candidate_nodes if n.label == label), None)
 
     async def _find_node_by_string(self, label: str, user_id: int) -> Node:
@@ -49,9 +43,7 @@ class KnowledgeGraphProcessor:
         return result.scalars().first()
 
     async def create_or_update_nodes(self, entities: List[Dict], user_id: int) -> List[Node]:
-        """
-        Create new nodes or update existing ones based on extracted entities.
-        """
+        """Create new nodes or update existing ones based on extracted entities."""
         nodes = []
         for entity in entities:
             # Check if node exists
@@ -66,9 +58,7 @@ class KnowledgeGraphProcessor:
         return nodes
 
     async def create_edges(self, nodes: List[Node], chat: Chat) -> List[Edge]:
-        """
-        Create edges between nodes based on their relationships in the chat.
-        """
+        """Create edges between nodes based on their relationships in the chat."""
         # Convert nodes to the format expected by get_edges
         node_dicts = [{"label": node.label, "id": node.id} for node in nodes]
 
@@ -99,9 +89,7 @@ class KnowledgeGraphProcessor:
         return edges
 
     async def update_graph(self, nodes: List[Node], edges: List[Edge]) -> None:
-        """
-        Update the knowledge graph with new nodes and edges.
-        """
+        """Update the knowledge graph with new nodes and edges."""
         # This method might involve updating global graph statistics,
         # triggering any graph-wide computations, etc.
         # For now, we'll just ensure all changes are committed to the database
@@ -109,15 +97,15 @@ class KnowledgeGraphProcessor:
 
 
 class GraphProcessingQueue:
-    def __init__(self):
+    def __init__(self) -> None:
         """Create a new processing queue."""
         self.queue = asyncio.Queue()
 
-    async def add_task(self, chat: Chat):
+    async def add_task(self, chat: Chat) -> None:
         """Add a chat to the processing queue."""
         await self.queue.put(chat)
 
-    async def process_queue(self, processor: KnowledgeGraphProcessor):
+    async def process_queue(self, processor: KnowledgeGraphProcessor) -> None:
         """Process the queue of chat messages."""
         while True:
             chat = await self.queue.get()

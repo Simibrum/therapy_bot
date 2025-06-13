@@ -1,9 +1,9 @@
 """Module contains the Edge model."""
 
+from database import Base
 from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from database import Base
 from models.bytes_vector_mixin import BytesVectorMixin
 
 

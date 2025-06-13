@@ -8,7 +8,7 @@ from llm.graph_processing import api_request, get_edges, get_nodes
 
 # This is a simple test double that can switch between mocked and real API calls
 class APITestDouble:
-    def __init__(self, use_real_api=False):
+    def __init__(self, use_real_api=False) -> None:
         self.use_real_api = use_real_api
 
     def request(self, *args, **kwargs):
@@ -115,9 +115,9 @@ class TestGetEdgesSwitch:
         assert all("source" in edge and "target" in edge for edge in edges)
 
         # Check for consistency between nodes and edges
-        node_labels = set(node["label"] for node in nodes)
-        edge_sources = set(edge["source"] for edge in edges)
-        edge_targets = set(edge["target"] for edge in edges)
+        node_labels = {node["label"] for node in nodes}
+        edge_sources = {edge["source"] for edge in edges}
+        edge_targets = {edge["target"] for edge in edges}
         assert edge_sources.issubset(node_labels), "All edge sources should correspond to node labels"
         assert edge_targets.issubset(node_labels), "All edge targets should correspond to node labels"
 

@@ -1,10 +1,16 @@
 """Logic to process chat text data to generate knowledge graph representations."""
-import spacy
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from llm.graph_processing import get_nodes
 from models.chat_reference import ChatReference
 from models.graph.node import Node
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
+
+if TYPE_CHECKING:
+    import spacy
+    from sqlalchemy.orm import Session
 
 
 def process_text_and_create_references(
@@ -41,14 +47,14 @@ def process_text_and_create_references(
                 db.add(chat_ref)
                 chat_references.append(chat_ref)
 
-        except SQLAlchemyError as e:
+        except SQLAlchemyError:
             db.rollback()
-            raise e
+            raise
 
     try:
         db.commit()
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         db.rollback()
-        raise e
+        raise
 
     return chat_references

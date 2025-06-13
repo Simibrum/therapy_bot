@@ -1,7 +1,6 @@
 """Fixtures for testing graph models."""
 
 import pytest
-
 from models.graph.node import Node
 
 

@@ -12,12 +12,11 @@ describe('<App />', () => {
     // Assuming you have a function or context to check auth status.
     // Mock it to return false (user not authenticated)
 
-    const { getByTestId } = render(<App />);
-    expect(getByTestId('login-screen')).toBeInTheDocument();
+    render(<App />);
+    const loginScreen = screen.getByTestId('login-screen');
+    expect(loginScreen).toBeInTheDocument();
   });
-});
 
-describe('<App />', () => {
     it('should display HomeScreen after successful login', async () => {
         // Setup mock to simulate successful login
         handleLogin.mockResolvedValue('fake-jwt-token');

@@ -105,7 +105,7 @@ class DBSessionManager:
         return cls._async_engine
 
     @classmethod
-    def reset(cls):
+    def reset(cls) -> None:
         """Reset all engine and session instances."""
         if cls._sync_engine:
             cls._sync_engine.dispose()

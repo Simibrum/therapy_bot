@@ -1,13 +1,16 @@
 """Common functions for GPT generation."""
+from __future__ import annotations
+
 import random
 import time
-from logging import Logger
-from typing import List
+from typing import TYPE_CHECKING
 
 import tiktoken
+from config import logger, openai_api_key
 from openai import OpenAI
 
-from config import logger, openai_api_key
+if TYPE_CHECKING:
+    from logging import Logger
 
 # Set the OpenAI model
 MODEL = "gpt-4"
@@ -19,17 +22,16 @@ client = OpenAI(api_key=openai_api_key)
 def chat_completion_wrapper(model, messages, temperature: float = 0.7):
     """Wrap the openai chat completion API to allow test substitution."""
     response = client.chat.completions.create(model=model, messages=messages, temperature=temperature)
-    response = response.choices[0].message.content
-    return response
+    return response.choices[0].message.content
 
 
 def api_request(
-    text: str = None,
-    messages: List[dict] = None,
+    text: str | None = None,
+    messages: list[dict] | None = None,
     model: str = MODEL,
     temperature: float = 0.7,
     gen_logger: Logger = logger,
-) -> List[List[float]] | str:
+) -> list[list[float]] | str:
     """Make a request to the openai api."""
     max_tries = 5
     initial_delay = 1
@@ -54,14 +56,15 @@ def api_request(
             return result
         except Exception as e:
             if attempt == max_tries:
-                gen_logger.error(f"API request failed after {attempt} attempts with final error {e}.")
+                gen_logger.exception(f"API request failed after {attempt} attempts with final error {e}.")
                 return []
 
             delay = min(initial_delay * (backoff_factor ** (attempt - 1)), max_delay)
             jitter = random.uniform(jitter_range[0], jitter_range[1])  # nosec: B311
             sleep_time = delay + jitter
-            gen_logger.error(f"API request failed with error: {e}. " f"Retrying in {sleep_time:.2f} seconds.")
+            gen_logger.exception(f"API request failed with error: {e}. " f"Retrying in {sleep_time:.2f} seconds.")
             time.sleep(sleep_time)
+    return None
 
 
 def num_tokens_from_messages(messages, model="gpt-3.5-turbo-0301"):
@@ -81,4 +84,5 @@ def num_tokens_from_messages(messages, model="gpt-3.5-turbo-0301"):
             num_tokens += 2  # every reply is primed with <im_start>assistant
         return num_tokens
     else:
-        raise NotImplementedError(f"""num_tokens_from_messages() is not presently implemented for model {model}.""")
+        msg = f"""num_tokens_from_messages() is not presently implemented for model {model}."""
+        raise NotImplementedError(msg)

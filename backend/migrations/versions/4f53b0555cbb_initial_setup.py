@@ -1,7 +1,7 @@
-"""Initial setup
+"""Initial setup.
 
 Revision ID: 4f53b0555cbb
-Revises: 
+Revises:
 Create Date: 2024-01-20 10:41:55.413939
 
 """

@@ -21,8 +21,7 @@ def encrypt_string(key: bytes, plaintext: str) -> str:
     """
     cipher_suite = Fernet(key)
     ciphertext_bytes = cipher_suite.encrypt(plaintext.encode())
-    ciphertext_base64 = base64.urlsafe_b64encode(ciphertext_bytes).decode()
-    return ciphertext_base64
+    return base64.urlsafe_b64encode(ciphertext_bytes).decode()
 
 
 def decrypt_string(key: bytes, ciphertext_base64: str) -> str:
@@ -41,8 +40,7 @@ def decrypt_string(key: bytes, ciphertext_base64: str) -> str:
     """
     ciphertext_bytes = base64.urlsafe_b64decode(ciphertext_base64.encode())
     cipher_suite = Fernet(key)
-    plaintext = cipher_suite.decrypt(ciphertext_bytes).decode()
-    return plaintext
+    return cipher_suite.decrypt(ciphertext_bytes).decode()
 
 
 def generate_encryption_key() -> str:

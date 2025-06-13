@@ -1,4 +1,6 @@
 """Route for login."""
+from __future__ import annotations
+
 from datetime import timedelta
 
 from database.db_engine import get_db
@@ -35,7 +37,7 @@ def login_form(
     return authenticate_user(form_data.username, form_data.password, session)
 
 
-def authenticate_user(username: str, password: str, session: Session):
+def authenticate_user(username: str, password: str, session: Session) -> UserLoginOut:
     """Common authentication logic."""
     if not username or not password:
         raise InvalidCredentialsException

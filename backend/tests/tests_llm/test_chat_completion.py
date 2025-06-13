@@ -1,6 +1,5 @@
 """Tests for the chat completion."""
 import pytest
-
 from llm.chat_completion import get_chat_completion
 
 
