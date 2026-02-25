@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from models import User
 
 from app.dependencies import manager
+from app.routes.knowledge_graph import router as knowledge_graph_router
 from app.routes.login import router as login_router
 from app.routes.therapy_sessions import router as therapy_sessions_router
 from app.schemas.pydantic_users import UserOut
@@ -39,6 +40,8 @@ executor = ThreadPoolExecutor()
 app.include_router(login_router)
 # Add the therapy sessions router
 app.include_router(therapy_sessions_router)
+# Add the knowledge graph router
+app.include_router(knowledge_graph_router)
 
 
 @app.get("/")

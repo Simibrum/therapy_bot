@@ -48,7 +48,7 @@ class Node(Base, BytesVectorMixin):
         self.label = sanitize_input(label)
         self.user_id = user_id
 
-        if type is not None:
+        if node_type is not None:
             validate_type(node_type)
             self.type = node_type
 

@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class NodeOut(BaseModel):
     """Node in a graph."""
+
+    model_config = ConfigDict(from_attributes=True)
 
     id: int
     label: str

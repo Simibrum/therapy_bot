@@ -13,7 +13,7 @@ from models.knowledge import VALID_TYPES
 
 from llm.common import api_request
 
-MODEL = "gpt-4o"
+MODEL = "gpt-5-mini"
 
 GRAPH_PROCESSOR_SYSTEM_PROMPT = (
     "You are an AI expert specializing in knowledge graph creation with the "
@@ -109,7 +109,7 @@ def get_nodes(doc: Doc) -> list[dict]:
         clean_response = response.replace("```", "")
         nodes = json.loads(clean_response)
     except json.JSONDecodeError:
-        logger.error(f"Error parsing JSON response: {response}")
+        logger.error("Error parsing JSON response: %s", response)
         nodes = {}
     # If the response is nested, extract the nodes
     if "nodes" in nodes:
@@ -136,7 +136,7 @@ def get_edges(doc: Doc, existing_nodes: list[dict]) -> list[dict]:
         clean_response = response.replace("```", "")
         edges = json.loads(clean_response)
     except json.JSONDecodeError:
-        logger.error(f"Error parsing JSON response: {response}")
+        logger.error("Error parsing JSON response: %s", response)
         edges = {}
     # If the response is nested, extract the edges
     if "edges" in edges:
