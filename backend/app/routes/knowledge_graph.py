@@ -7,6 +7,7 @@ from config import logger
 from database import get_db
 from fastapi import APIRouter, Depends, HTTPException
 from models import Chat, ChatReference, Edge, Node, TherapySession, User
+from sqlalchemy import select
 from spacy_nlp import nlp_service
 
 from app.dependencies import manager
@@ -43,11 +44,11 @@ def get_session_entities(
     """Get extracted entities (nodes) for a therapy session."""
     _verify_session_ownership(db, session_id, current_user.id)
 
-    chat_ids = db.query(Chat.id).filter(Chat.therapy_session_id == session_id).subquery()
+    chat_ids_q = select(Chat.id).where(Chat.therapy_session_id == session_id)
     entities = (
         db.query(Node)
         .join(ChatReference)
-        .filter(ChatReference.chat_id.in_(chat_ids))
+        .filter(ChatReference.chat_id.in_(chat_ids_q))
         .distinct()
         .all()
     )
@@ -63,20 +64,19 @@ def get_session_edges(
     _verify_session_ownership(db, session_id, current_user.id)
 
     # Get node IDs that belong to this session via chat references
-    chat_ids = db.query(Chat.id).filter(Chat.therapy_session_id == session_id).subquery()
-    node_ids = (
-        db.query(ChatReference.node_id)
-        .filter(ChatReference.chat_id.in_(chat_ids))
+    chat_ids_q = select(Chat.id).where(Chat.therapy_session_id == session_id)
+    node_ids_q = (
+        select(ChatReference.node_id)
+        .where(ChatReference.chat_id.in_(chat_ids_q))
         .distinct()
-        .subquery()
     )
 
     # Get edges where both from_node and to_node are in the session's node set
     edges = (
         db.query(Edge)
         .filter(
-            Edge.from_node_id.in_(node_ids),
-            Edge.to_node_id.in_(node_ids),
+            Edge.from_node_id.in_(node_ids_q),
+            Edge.to_node_id.in_(node_ids_q),
             Edge.user_id == current_user.id,
         )
         .all()
@@ -133,13 +133,13 @@ def batch_process_chats(
     edges_before = db.query(Edge).filter(Edge.user_id == current_user.id).count()
 
     # Get all user chats that don't already have chat references
-    chats_with_refs = db.query(ChatReference.chat_id).distinct().subquery()
+    chats_with_refs_q = select(ChatReference.chat_id).distinct()
     unprocessed_chats = (
         db.query(Chat)
         .filter(
             Chat.user_id == current_user.id,
             Chat.sender == "user",
-            ~Chat.id.in_(chats_with_refs),
+            ~Chat.id.in_(chats_with_refs_q),
         )
         .order_by(Chat.timestamp.asc())
         .all()
