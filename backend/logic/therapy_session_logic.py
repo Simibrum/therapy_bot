@@ -150,7 +150,7 @@ class TherapySessionLogic:
                         text=text, chat_id=new_chat.id, user_id=self.user_id, db=session, nlp=self.nlp
                     )
                 except Exception as e:
-                    logger.error(f"Entity extraction failed: {e}")
+                    logger.error("Entity extraction failed: %s", e)
                     # Don't let entity extraction break the chat flow
             chat_out = ChatOut.model_validate(new_chat)
             if new_chat.id not in self.index_to_id.values():
